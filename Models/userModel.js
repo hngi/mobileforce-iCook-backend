@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const schema = mongoose.Schema;
 
 const userSchema = new schema({
   auth: {
     type: schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
   },
   name: {
     type: String,
@@ -22,18 +22,16 @@ const userSchema = new schema({
   favourites: [String], //array of dish IDs
   followers: [
     {
-      name: String,
       id: schema.Types.ObjectId,
     },
   ],
   following: [
     {
-      name: String,
       id: schema.Types.ObjectId,
     },
   ],
 });
 
-const User = mongoose.model("Profile", userSchema);
+const User = mongoose.model('Profile', userSchema);
 
 module.exports = User;
