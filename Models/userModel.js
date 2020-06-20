@@ -22,11 +22,13 @@ const userSchema = new schema({
   favourites: [String], //array of dish IDs
   followers: [
     {
+      name: String,
       id: schema.Types.ObjectId,
     },
   ],
   following: [
     {
+      name: String,
       id: schema.Types.ObjectId,
     },
   ],

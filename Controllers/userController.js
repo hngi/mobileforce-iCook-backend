@@ -42,7 +42,9 @@ exports.update_user_favourites = (req, res, next) => {
 };
 
 // /api/users/id/followers - get
-exports.get_followers = (req, res, next) => {};
+exports.get_followers = (req, res, next) => {
+
+};
 
 // /api/users/id/following - get
 exports.get_following = (req, res, next) => {};
@@ -53,15 +55,17 @@ exports.followUser = async (req, res, next) => {
     await User.findByIdAndUpdate(
       req.body.followId,
       {
-        $push: { followers: req.user._id },
+        $push: { name: req.user.name, followers: req.user._id },
       },
       { new: true }
     );
 
+    const findUser = await User.findById(req.body,followId)
+
     await User.findByIdAndUpdate(
       req.user._id,
       {
-        $push: { following: req.body.followId },
+        $push: {name: findUser.name, following: req.body.followId },
       },
       { new: true }
     );
@@ -74,21 +78,22 @@ exports.followUser = async (req, res, next) => {
   }
 };
 
-// /api/users/id/unfollow - post
+// /api/users/id/unfollow - put
 exports.unfollowUser = (req, res, next) => {
   try {
     await User.findByIdAndUpdate(
       req.body.unfollowId,
       {
-        $pull: { followers: req.user._id },
+        $pull: {name: req.user.name, followers: req.user._id },
       },
       { new: true }
     );
+    const findUser = await User.findById(req.body,followId)
 
     await User.findByIdAndUpdate(
       req.user._id,
       {
-        $pull: { following: req.body.unfollowId },
+        $pull: {name: findUser.name, following: req.body.unfollowId },
       },
       { new: true }
     );
