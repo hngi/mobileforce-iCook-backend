@@ -7,8 +7,17 @@ const app = express();
 
 app.use(bodyParser.json());
 
+const authRoute = require('../mobileforce-iCook-backend/Routes/authRoute');
 
 
+//Routes
+
+//home route
+app.get('/api/v1', (req, res) => {
+    res.status(200).json({status: "success", message: "Welcome to iCook app"});
+});
+//auth route
+app.use('/api/v1', authRoute);
 
 //connect to mongoDB Atlas
 mongoose
