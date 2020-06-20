@@ -7,12 +7,7 @@ const cors = require('cors')
 
 const app = express();
 
-//init middleware
-//1. Body Parser
-app.use(express.json())
-app.use(express.urlencoded({extended: false}))
-//2. CORS
-app.use(cors())
+
 
 //connect to mongoDB Atlas
 //TODO: put mongodb URI in .env file
