@@ -1,5 +1,5 @@
-const Dish = require("../Models/dishModel");
-const uploadImage = require("../Database/uploadImage");
+const Dish = require("../../Models/dishModel");
+const uploadImage = require("../../Database/uploadImage");
 
 exports.get_all_dishes = async (req, res, next) => {
   res.header("Content-Type", "application/json");

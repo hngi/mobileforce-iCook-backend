@@ -1,7 +1,7 @@
 require('dotenv').config();
 const JWT = require('jsonwebtoken');
-const Profile = require("../Models/profileModel")
-const User = require('../Models/authModel');
+const Profile = require("../../Models/profileModel")
+const User = require('../../Models/authModel');
 const mongoose = require('mongoose');
 
 
@@ -57,7 +57,7 @@ module.exports = {
   signIn: async (req, res, next) => {
     // Generate token
     const token = signToken(req.user);
-    res.status(200).json({ token });
+    res.status(200).json({ token, uid: req.user.user.id});
   },
 
   googleOAuth: async (req, res, next) => {

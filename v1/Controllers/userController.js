@@ -1,4 +1,5 @@
-const User = require("../Models/profileModel");
+const User = require("../../Models/profileModel");
+
 
 exports.get_all_users = async (req, res, next) => {
   try {
@@ -83,7 +84,7 @@ exports.followUser = async (req, res, next) => {
 };
 
 // /api/users/id/unfollow - put
-exports.unfollowUser = (req, res, next) => {
+exports.unfollowUser = async (req, res, next) => {
   try {
     await User.findByIdAndUpdate(
       req.body.unfollowId,
