@@ -1,4 +1,7 @@
 const User = require("../../Models/profileModel");
+const Dish = require("../../Models/dishModel")
+const mongoose = require('mongoose');
+const uploadImage = require("../../Database/uploadImage");
 
 
 exports.get_all_users = async (req, res, next) => {
@@ -43,6 +46,56 @@ exports.update_user_favourites = (req, res, next) => {
     }
   );
 };
+
+//patch request
+//endpoint: /api/users/{id}/dishes
+exports.add_dish = async (req, res, next) => {
+  const newDishID = mongoose.Types.ObjectId();
+  const {
+    name,
+    description,
+    ingredients,
+    steps,
+    healthBenefits,
+  } = req.body;
+  const dishImages = req.files;
+  const dishImagesLinks = [];
+
+  try {
+    dishImages.forEach((dishImage) => {
+      dishImagesLinks.push(uploadImage(dishImage));
+    });
+    console.log(dishImagesLinks);
+    const newDish = new Dish({
+      _id: newDishID,
+      chef: req.params.id,
+      name,
+      dishImages: dishImagesLinks,
+      description,
+      ingredients,
+      steps,
+      healthBenefits,
+    });
+    await newDish.save();
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+    return;
+  }
+  User.findOneAndUpdate(
+    { _id: req.params.id },
+    { $push: { dishes: newDishID } },
+    null,
+    (err, result) => {
+      if (err) {
+        res.status(500).json({ message: err.message });
+        return;
+      } else {
+        console.log(result);
+        res.status(201).json({message: "dish successfully added"});
+      }
+    }
+  );
+}
 
 // /api/users/id/followers - get 
 exports.get_followers = (req, res, next) => {

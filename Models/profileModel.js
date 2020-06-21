@@ -14,8 +14,14 @@ const profileSchema = new schema({
   userImage: String,
   country: String,
   phoneNumber: String,
-  dishes: [String], //array of dishes posted by this user
-  favourites: [String], //array of dish IDs
+  dishes: [{
+    type: schema.Types.ObjectId,
+    ref: "Profile"
+  }], //array of dishes posted by this user
+  favourites: [{
+    type: schema.Types.ObjectId,
+    ref: "Dish"
+  }], //array of dish IDs
   followers: [
     {
       name: String,

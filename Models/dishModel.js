@@ -6,6 +6,10 @@ const dishSchema = new schema({
     type: String,
     required: true
   },
+  chef: {
+    type: schema.Types.ObjectId,
+    ref: 'Profile'
+  },
   dishImages: [String],
   description: String,
   likes: { type: Number, min: 0, default: 0 },
