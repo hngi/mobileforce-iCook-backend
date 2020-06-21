@@ -53,12 +53,59 @@ exports.get_following = (req, res, next) => {
 
 }
 
-// /api/users/id/follow - post 
-exports.followUser = (req, res, next) => {
+// /api/users/id/follow - put
+exports.followUser = async (req, res, next) => {
+  try {
+    await User.findByIdAndUpdate(
+      req.body.followId,
+      {
+        $push: { name: req.user.name, followers: req.user._id },
+      },
+      { new: true }
+    );
 
-}
+    const findUser = await User.findById(req.body,followId)
 
-// /api/users/id/unfollow - post
+    await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $push: {name: findUser.name, following: req.body.followId },
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+    });
+  } catch (err) {
+    return res.status(400).json({ error: err });
+  }
+};
+
+// /api/users/id/unfollow - put
 exports.unfollowUser = (req, res, next) => {
+  try {
+    await User.findByIdAndUpdate(
+      req.body.unfollowId,
+      {
+        $pull: {name: req.user.name, followers: req.user._id },
+      },
+      { new: true }
+    );
+    const findUser = await User.findById(req.body,followId)
 
-}
+    await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $pull: {name: findUser.name, following: req.body.unfollowId },
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+    });
+  } catch (err) {
+    return res.status(400).json({ error: err });
+  }
+};
