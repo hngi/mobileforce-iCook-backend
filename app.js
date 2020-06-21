@@ -18,8 +18,10 @@ app.use(cors())
 
 //connect to mongoDB Atlas
 //TODO: put mongodb URI in .env file
+
+
 mongoose.connect(
-  "mongodb+srv://GoZaddy:iCookPass123@cluster0-zogx0.gcp.mongodb.net/iChop?retryWrites=true&w=majority",
+  process.env.MONGODB_URI || "mongodb+srv://GoZaddy:iCookPass123@cluster0-zogx0.gcp.mongodb.net/iChop?retryWrites=true&w=majority",
   { useNewUrlParser: true, useUnifiedTopology: true }
 );
 const db = mongoose.connection;
