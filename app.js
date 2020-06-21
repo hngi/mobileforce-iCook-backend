@@ -24,9 +24,11 @@ db.once("open", () => {
 //api routes
 app.use("/api/users", require("./Routes/userRoute"))
 app.use("/api/dishes", require("./Routes/dishRoute"))
+app.use("/api/authenticate", require("./Routes/authRoute"))
 
 //connect to server locally on port 3000
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server listening at ${port}`)
+  
 })

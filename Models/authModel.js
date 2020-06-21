@@ -35,6 +35,10 @@ const userSchema = new Schema({
       type: String,
       lowercase: true
     }
+  },
+  user: {
+    id: Schema.Types.ObjectId,
+    
   }
 });
 

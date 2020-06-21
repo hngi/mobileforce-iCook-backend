@@ -1,4 +1,4 @@
-const User = require("../Models/userModel");
+const User = require("../Models/profileModel");
 
 exports.get_all_users = async (req, res, next) => {
   try {
@@ -26,6 +26,8 @@ exports.get_user_by_id = async (req, res, next) => {
 //patch request
 //endpoint : /api/users/{id}/favourites - patch request
 exports.update_user_favourites = (req, res, next) => {
+    // to be refactored
+    //a transaction should be done to add to the user's favourties and add to the likes of the dish
   User.findOneAndUpdate(
     { _id: req.params.id },
     { $push: { favourites: req.body.dishId } },

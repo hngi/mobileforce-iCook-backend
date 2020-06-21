@@ -1,6 +1,9 @@
 require('dotenv').config();
 const JWT = require('jsonwebtoken');
+const Profile = require("../Models/profileModel")
 const User = require('../Models/authModel');
+const mongoose = require('mongoose');
+
 
 
 signToken = user => {
@@ -14,7 +17,9 @@ signToken = user => {
 
 module.exports = {
   signUp: async (req, res, next) => {
-    const { email, password } = req.body;
+      const email = "faruq@test.com"
+      const password= "test123"
+    //const { email, password } = req.body;
 
     // Check if there is a user with the same email
     const foundUser = await User.findOne({ "local.email": email });
@@ -25,15 +30,21 @@ module.exports = {
     
 
     // Create a new user
+    const userID = mongoose.Types.ObjectId();
     const newUser = new User({ 
       method: 'local',
       local: {
         email: email, 
         password: password
+      },
+      user: {
+        id: userID,
       }
     });
-
+    //create new profile for new user
+    const newProfile = new Profile({_id: userID, email: email})
     await newUser.save();
+    await newProfile.save();
 
     // Generate the token
     const token = signToken(newUser);
