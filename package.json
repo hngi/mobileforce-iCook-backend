@@ -1,10 +1,12 @@
 {
-  "name": "mobileforce-iCook-backend",
+  "name": "mobileforce-icook-backend",
   "version": "1.0.0",
   "description": "HNGi7 TEAM MOBILE FORCE iCOOK APP- BACKEND",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -18,8 +20,24 @@
   },
   "homepage": "https://github.com/omodauda/mobileforce-iCook-backend#readme",
   "dependencies": {
-    "body-parser": "^1.19.0",
+    "aws-sdk": "^2.699.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "mongoose": "^5.9.19"
+    "express-promise-router": "^4.0.1",
+    "joi": "^14.3.1",
+    "mongodb": "^3.5.9",
+    "mongoose": "^5.9.19",
+    "multer": "^1.4.2",
+    "passport": "^0.4.1",
+    "passport-facebook-token": "^4.0.0",
+    "passport-google-plus-token": "^2.1.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "uuid": "^8.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
   }
 }
