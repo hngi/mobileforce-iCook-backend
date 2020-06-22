@@ -17,17 +17,6 @@ const userSchema = new Schema({
     password: { 
       type: String,
     },
-    // name: {
-    //   type: String,
-    // },
-    // gender: {
-    //   type: String,
-    //   default: '',
-    //   enum: ["Male", "Female"],
-    // },
-    // phone: {
-    //   type: String,
-    // }
   },
   google: {
     id: {
