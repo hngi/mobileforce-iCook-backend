@@ -141,7 +141,7 @@ exports.get_following = async (req, res, next) => {
 // /api/users/id/follow/ - put
 exports.followUser = async (req, res, next) => {
   const followId = req.body.followId.toString();
-  const id = req.user.user.id.toString();
+  const id = req.user.profile.id.toString();
 
   const user = await User.findById(id);
   const following = user.following;
@@ -185,7 +185,7 @@ exports.followUser = async (req, res, next) => {
 // /api/users/id/unfollow - put
 exports.unfollowUser = async (req, res, next) => {
   const unfollowId = req.body.unfollowId.toString();
-  const id = req.user.user.id.toString();
+  const id = req.user.profile.id.toString();
 
   const user = await User.findById(id);
   const following = user.following;
