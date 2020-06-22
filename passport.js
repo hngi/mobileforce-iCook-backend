@@ -93,11 +93,11 @@ passport.use('facebookToken', new FacebookTokenStrategy({
 // LOCAL STRATEGY
 passport.use(new LocalStrategy({
   usernameField: 'email'
-}, async (email, password, done) => {
+}, async (email, password, done, res) => {
   try {
     // Find the user given the email
     const user = await User.findOne({ "local.email": email });
-    console.log(user)
+    
     // If not, handle it
     if (!user) {
       return done(null, false);
@@ -109,6 +109,8 @@ passport.use(new LocalStrategy({
     // If not, handle it
     if (!isMatch) {
       return done(null, false);
+      
+      
     }
   
     // Otherwise, return the user
