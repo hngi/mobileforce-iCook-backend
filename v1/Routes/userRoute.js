@@ -5,6 +5,9 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+const passport = require('passport');
+const passportJWT = passport.authenticate('jwt', { session: false });
+
 // get all users
 router.get('/', user_controller.get_all_users);
 
@@ -19,18 +22,15 @@ router.patch('/:id/favourites', user_controller.update_user_favourites);
 router.patch('/:id/dishes', upload.single('dishImage'), user_controller.add_dish);
 
 // follow a user
-router.put('/follow', user_controller.followUser);
+router.put('/follow', passportJWT, user_controller.followUser);
 
 // unfollow a user
-router.put('/unfollow', user_controller.unfollowUser);
+router.put('/unfollow', passportJWT, user_controller.unfollowUser);
 
 // get followers
-router.get('/followers', user_controller.get_followers);
+router.get('/followers/:id', user_controller.get_followers);
 
 // get following
-router.get('/following', user_controller.get_following);
-
-// delete a dish by id
-router.get('/:id/dishes/dishId', user_controller.deleteDish);
+router.get('/following/:id', user_controller.get_following);
 
 module.exports = router;

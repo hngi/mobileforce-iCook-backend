@@ -7,42 +7,41 @@ const userSchema = new Schema({
   method: {
     type: String,
     enum: ['local', 'google', 'facebook'],
-    required: true
+    required: true,
   },
   local: {
     email: {
       type: String,
-      lowercase: true
+      lowercase: true,
     },
-    password: { 
-      type: String
-    }
+    password: {
+      type: String,
+    },
   },
   google: {
     id: {
-      type: String
+      type: String,
     },
     email: {
       type: String,
-      lowercase: true
-    }
+      lowercase: true,
+    },
   },
   facebook: {
     id: {
-      type: String
+      type: String,
     },
     email: {
       type: String,
-      lowercase: true
-    }
+      lowercase: true,
+    },
   },
   user: {
     id: Schema.Types.ObjectId,
-    
-  }
+  },
 });
 
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   try {
     console.log('entered');
     if (this.method !== 'local') {
@@ -57,18 +56,18 @@ userSchema.pre('save', async function(next) {
     this.local.password = passwordHash;
     console.log('exited');
     next();
-  } catch(error) {
+  } catch (error) {
     next(error);
   }
 });
 
-userSchema.methods.isValidPassword = async function(newPassword) {
+userSchema.methods.isValidPassword = async function (newPassword) {
   try {
     return await bcrypt.compare(newPassword, this.local.password);
-  } catch(error) {
+  } catch (error) {
     throw new Error(error);
   }
-}
+};
 
 // Create a model
 const User = mongoose.model('user', userSchema);

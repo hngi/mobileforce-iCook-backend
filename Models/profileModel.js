@@ -1,5 +1,6 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const schema = mongoose.Schema;
+const { ObjectId } = mongoose.Schema.Types;
 
 const profileSchema = new schema({
   name: {
@@ -14,29 +15,22 @@ const profileSchema = new schema({
   userImage: String,
   country: String,
   phoneNumber: String,
-  dishes: [{
-    type: schema.Types.ObjectId,
-    ref: "Profile"
-  }], //array of dishes posted by this user
-  favourites: [{
-    type: schema.Types.ObjectId,
-    ref: "Dish"
-  }], //array of dish IDs
-  followers: [
+  dishes: [
     {
-      name: String,
-      id: schema.Types.ObjectId,
+      type: schema.Types.ObjectId,
+      ref: 'Profile',
     },
-  ],
-  following: [
+  ], //array of dishes posted by this user
+  favourites: [
     {
-      name: String,
-      id: schema.Types.ObjectId,
+      type: schema.Types.ObjectId,
+      ref: 'Dish',
     },
-  ],
+  ], //array of dish IDs
+  followers: [{ type: ObjectId, ref: 'Profile' }],
+  following: [{ type: ObjectId, ref: 'Profile' }],
 });
 
-const Profile = mongoose.model("Profile", profileSchema);
-
+const Profile = mongoose.model('Profile', profileSchema);
 
 module.exports = Profile;

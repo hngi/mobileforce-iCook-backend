@@ -102,6 +102,7 @@ exports.get_followers = async (req, res, next) => {
     }
 
     const followers = user.followers;
+
     res.status(200).json({
       success: true,
       data: followers,
@@ -125,6 +126,7 @@ exports.get_following = async (req, res, next) => {
     }
 
     const following = user.following;
+
     res.status(200).json({
       success: true,
       data: following,
@@ -138,21 +140,25 @@ exports.get_following = async (req, res, next) => {
 
 // /api/users/id/follow/ - put
 exports.followUser = async (req, res, next) => {
+  console.log('user controller ', req.user.user.id);
+  console.log('params', req.body.followId);
+
+  const followId = req.body.followId.toString();
+  const id = req.user.user.id.toString();
+
   try {
     await User.findByIdAndUpdate(
-      req.body.followId,
+      followId,
       {
-        $push: { name: req.user.name, followers: req.user._id },
+        $push: { followers: id },
       },
       { new: true }
     );
 
-    const findUser = await User.findById(req.body, followId);
-
     await User.findByIdAndUpdate(
-      req.user._id,
+      id,
       {
-        $push: { name: findUser.name, following: req.body.followId },
+        $push: { following: followId },
       },
       { new: true }
     );
@@ -161,26 +167,28 @@ exports.followUser = async (req, res, next) => {
       success: true,
     });
   } catch (err) {
+    console.log(err);
     return res.status(400).json({ error: err });
   }
 };
 
 // /api/users/id/unfollow - put
 exports.unfollowUser = async (req, res, next) => {
+  const unfollowId = req.body.unfollowId.toString();
+  const id = req.user.user.id.toString();
+
   try {
     await User.findByIdAndUpdate(
-      req.body.unfollowId,
+      unfollowId,
       {
-        $pull: { name: req.user.name, followers: req.user._id },
+        $pull: { followers: id },
       },
       { new: true }
     );
-    const findUser = await User.findById(req.body, followId);
-
     await User.findByIdAndUpdate(
-      req.user._id,
+      id,
       {
-        $pull: { name: findUser.name, following: req.body.unfollowId },
+        $pull: { following: unfollowId },
       },
       { new: true }
     );
@@ -191,29 +199,4 @@ exports.unfollowUser = async (req, res, next) => {
   } catch (err) {
     return res.status(400).json({ error: err });
   }
-};
-
-// /api/v1/users/:id/dishes/:dishId
-exports.deleteDish = async (req, res, next) => {
-  const userId = req.params.id;
-  const dishId = req.params.dishId;
-
-  const user = await User.findOne({ _id: userId });
-  if (!user) {
-    return res.status(404).json({
-      message: 'User not found',
-    });
-  }
-
-  const dish = await Dish.findById(dishId);
-  if (!dish) {
-    return res.status(404).json({
-      message: 'Dish not found',
-    });
-  }
-
-  await dish.remove();
-  res.status(200).json({
-    message: 'Dish removed',
-  });
 };
