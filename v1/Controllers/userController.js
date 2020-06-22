@@ -140,11 +140,20 @@ exports.get_following = async (req, res, next) => {
 
 // /api/users/id/follow/ - put
 exports.followUser = async (req, res, next) => {
-  console.log('user controller ', req.user.user.id);
-  console.log('params', req.body.followId);
-
   const followId = req.body.followId.toString();
   const id = req.user.user.id.toString();
+
+  const user = await User.findById(id);
+  const following = user.following;
+
+  const isMatch = following.some((fol) => fol == followId);
+
+  if (isMatch) {
+    return res.status(400).json({
+      success: false,
+      message: `You are already following user with ID ${followId}`,
+    });
+  }
 
   try {
     await User.findByIdAndUpdate(
@@ -165,6 +174,7 @@ exports.followUser = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
+      message: `You have successfully followed user with ID ${followId} `,
     });
   } catch (err) {
     console.log(err);
@@ -176,6 +186,18 @@ exports.followUser = async (req, res, next) => {
 exports.unfollowUser = async (req, res, next) => {
   const unfollowId = req.body.unfollowId.toString();
   const id = req.user.user.id.toString();
+
+  const user = await User.findById(id);
+  const following = user.following;
+
+  const isMatch = following.find((fol) => fol == unfollowId);
+
+  if (!isMatch) {
+    return res.status(400).json({
+      success: false,
+      message: `You have already unfollowed user with ID ${unfollowId}`,
+    });
+  }
 
   try {
     await User.findByIdAndUpdate(
@@ -195,6 +217,7 @@ exports.unfollowUser = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
+      message: `You have successfully unfollowed user with ID ${unfollowId} `,
     });
   } catch (err) {
     return res.status(400).json({ error: err });
