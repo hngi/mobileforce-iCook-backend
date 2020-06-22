@@ -109,16 +109,35 @@ passport.use(
 );
 
 // LOCAL STRATEGY
+// passport.use(
+//   new LocalStrategy(
+//     {
+//       usernameField: 'email',
+//     },
+//     async (email, password, done) => {
+//       try {
+//         // Find the user given the email
+//         const user = await User.findOne({ 'local.email': email });
+//         console.log(user);
+//         // If not, handle it
+//         if (!user) {
+//           return done(null, false);
+//         }
+
+//         // Check if the password is correct
+//         const isMatch = await user.isValidPassword(password);
+
+// LOCAL STRATEGY
 passport.use(
   new LocalStrategy(
     {
       usernameField: 'email',
     },
-    async (email, password, done) => {
+    async (email, password, done, res) => {
       try {
         // Find the user given the email
         const user = await User.findOne({ 'local.email': email });
-        console.log(user);
+
         // If not, handle it
         if (!user) {
           return done(null, false);
@@ -132,10 +151,9 @@ passport.use(
           return done(null, false);
         }
 
-        // Otherwise, return the user
         done(null, user);
-      } catch (error) {
-        done(error, false);
+      } catch (err) {
+        done(err, false);
       }
     }
   )

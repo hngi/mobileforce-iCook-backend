@@ -12,6 +12,11 @@ const profileSchema = new schema({
     unique: true,
     trim: true,
   },
+  gender: {
+    type: String,
+    default: "",
+    enum: ["male", "female", "others"]
+  },
   userImage: String,
   country: String,
   phoneNumber: String,

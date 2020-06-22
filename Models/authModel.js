@@ -7,12 +7,14 @@ const userSchema = new Schema({
   method: {
     type: String,
     enum: ['local', 'google', 'facebook'],
-    required: true,
   },
   local: {
     email: {
       type: String,
       lowercase: true,
+    },
+    password: {
+      type: String,
     },
     password: {
       type: String,
@@ -36,7 +38,7 @@ const userSchema = new Schema({
       lowercase: true,
     },
   },
-  user: {
+  profile: {
     id: Schema.Types.ObjectId,
   },
 });
