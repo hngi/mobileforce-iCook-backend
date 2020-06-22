@@ -30,4 +30,7 @@ router.get('/followers', user_controller.get_followers);
 // get following
 router.get('/following', user_controller.get_following);
 
+// delete a dish by id
+router.get('/:id/dishes/dishId', user_controller.deleteDish);
+
 module.exports = router;
