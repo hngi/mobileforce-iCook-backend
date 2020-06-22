@@ -1,5 +1,5 @@
-const Dish = require("../Models/dishModel");
-const uploadImage = require("../Database/uploadImage");
+const Dish = require("../../Models/dishModel");
+const uploadImage = require("../../Database/uploadImage");
 
 exports.get_all_dishes = async (req, res, next) => {
   res.header("Content-Type", "application/json");
@@ -28,7 +28,9 @@ exports.get_dishes_by_ID = async (req, res, next) => {
   }
 };
 
-exports.add_dish = async (req, res, next) => {
+
+//moved to userController
+/*exports.add_dish = async (req, res, next) => {
   const {
     chef,
     name,
@@ -60,7 +62,7 @@ exports.add_dish = async (req, res, next) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-};
+};*/
 
 
 exports.delete_dish = (req, res, next) => {
