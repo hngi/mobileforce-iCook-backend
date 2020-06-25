@@ -62,7 +62,6 @@ module.exports = {
     // Generate the token
     const token = signToken(newUser);
     // Respond with token
-    // res.status(200).json({ token });
     return res.status(200).json({
       status: "success", 
       message: "user successfully registered!", 
@@ -76,16 +75,34 @@ module.exports = {
     });
     }
     catch(error){
-      res.status(400).json({status: "fail", message: error.message});
+      return res.status(400).json({status: "fail", error: error});
     }
-
   },  
 
   signIn: async (req, res, next) => {
     // Generate token
     console.log(req.user);
-    const token = signToken(req.user);
-    res.status(200).json({ user_id: req.user._id, token});
+    try{
+      const token = signToken(req.user);
+      res.header("x-auth-token", token)
+      .status(200)
+      .json({ 
+        status: "success",
+        error: "",
+        data: {
+          user_id: req.user._id, 
+          token
+        }
+      });
+    }
+    catch(error){
+      return res
+      .status(400)
+      .json({
+        status: "fail",
+        error: error
+      })
+    } 
   },
 
   googleOAuth: async (req, res, next) => {
@@ -93,20 +110,51 @@ module.exports = {
     // console.log('got here');
     try{
       const token = signToken(req.user);
-      res.status(200).json({ user_id: req.user._id, token });
+      res.header("x-auth-token", token)
+      .status(200)
+      .json({ 
+        status: "success",
+        error: "",
+        data: {
+          user_id: req.user._id, 
+          token
+        }
+      });
     }
     catch(error){
-      console.log(error)
-      res.status(400).json({status: "fail", message: error.message});
+      return res
+      .status(400)
+      .json({
+        status: "fail", 
+        error: error
+      });
     }
-    
   },
 
   facebookOAuth: async (req, res, next) => {
     // console.log('got here');
     // console.log('req.user', req.user);
-    const token = signToken(req.user);
-    res.status(200).json({ user_id: req.user._id, token });
+    try{
+      const token = signToken(req.user);
+      res.header("x-auth-token", token)
+      .status(200)
+      .json({ 
+        status: "success",
+        error: "",
+        data: {
+          user_id: req.user._id, 
+          token 
+        }
+        
+      });
+    }
+    catch(error){
+      return res
+      .status(400)
+      .json({
+        status: "fail", 
+        error: error
+      });
+    }
   }
-
 }
