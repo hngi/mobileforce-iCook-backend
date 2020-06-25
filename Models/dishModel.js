@@ -8,7 +8,7 @@ const dishSchema = new schema({
   },
   chef: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Profile"
+    ref: "profile"
   },
   dishImages: {
     type: [String]
@@ -35,6 +35,6 @@ const dishSchema = new schema({
   }],
 });
 
-const Dish = mongoose.model("Dish", dishSchema);
+const Dish = mongoose.model("dish", dishSchema);
 
 module.exports = Dish;

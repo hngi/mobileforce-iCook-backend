@@ -38,12 +38,8 @@ const userSchema = new Schema({
   },
   profile: [{
     type: Schema.Types.ObjectId,
-<<<<<<< HEAD
     ref: "profile"
     
-=======
-    ref: "Profile" 
->>>>>>> 4a62ee1b59c6ffc769d236d8c316804fe16e405b
   }]
 });
 

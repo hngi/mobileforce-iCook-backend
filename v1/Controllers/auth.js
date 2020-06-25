@@ -43,10 +43,6 @@ module.exports = {
     });
 
     // Create a new user
-<<<<<<< HEAD
-=======
-    const profileID = profile._id.toString();
->>>>>>> 4a62ee1b59c6ffc769d236d8c316804fe16e405b
     const newUser = new User({ 
       method: 'local',
       local: {
@@ -54,17 +50,7 @@ module.exports = {
         password: password,
       }
     });
-<<<<<<< HEAD
-    //create new profile for new user
-    const profile = new Profile({
-      email: email,
-      name: name,
-      phoneNumber: phone,
-      gender: gender  
-    });
-=======
-   
->>>>>>> 4a62ee1b59c6ffc769d236d8c316804fe16e405b
+    
     await profile.save();
     await newUser.profile.push(profile);
     await newUser.save();
@@ -86,11 +72,7 @@ module.exports = {
     });
     }
     catch(error){
-<<<<<<< HEAD
       return res.status(400).json({status: "fail", message: error.message});
-=======
-      return res.send(error);
->>>>>>> 4a62ee1b59c6ffc769d236d8c316804fe16e405b
     }
   },  
 

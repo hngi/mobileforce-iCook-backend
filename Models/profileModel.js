@@ -28,11 +28,11 @@ const profileSchema = new schema({
   },
   dishes: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Dish"
+    ref: "dish"
   }], //array of dishes posted by this user
   favDishes: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Dish"
+    ref: "dish"
   }], //array of dish IDs
   followers: [
     {
@@ -48,12 +48,7 @@ const profileSchema = new schema({
   ],
 });
 
-<<<<<<< HEAD
 const Profile = mongoose.model("profile", profileSchema);
-=======
-
-const Profile = mongoose.model("Profile", profileSchema);
->>>>>>> 4a62ee1b59c6ffc769d236d8c316804fe16e405b
 
 
 module.exports = Profile;
