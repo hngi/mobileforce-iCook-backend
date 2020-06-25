@@ -7,21 +7,27 @@ const dishSchema = new schema({
     required: true
   },
   chef: {
-    type: schema.Types.ObjectId,
-    ref: 'Profile'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Profile"
   },
-  dishImages: [String],
-  description: String,
-  likes: { type: Number, min: 0, default: 0 },
+  dishImages: {
+    type: [String]
+  },
+  recipe: {
+    type: [String]
+  },
+  likes: { 
+    type: Number, 
+    min: 0, 
+    default: 0 
+  },
   ingredients: {
     type: [String],
     required: true
   },
-  steps: {
-    type: [String],
-    required: true
+  healthBenefits: {
+    type: [String]
   },
-  healthBenefits: [String],
   comments: [{
     chefEmail: String,
     chefName: String,

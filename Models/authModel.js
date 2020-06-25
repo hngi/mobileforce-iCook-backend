@@ -38,8 +38,12 @@ const userSchema = new Schema({
   },
   profile: [{
     type: Schema.Types.ObjectId,
+<<<<<<< HEAD
     ref: "profile"
     
+=======
+    ref: "Profile" 
+>>>>>>> 4a62ee1b59c6ffc769d236d8c316804fe16e405b
   }]
 });
 
@@ -63,7 +67,7 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-userSchema.methods.isValidPassword = async function(newPassword) {
+userSchema.methods.isValidPassword = async function(newPassword, res) {
   try {
     return await bcrypt.compare(newPassword, this.local.password);
   } catch(error) {

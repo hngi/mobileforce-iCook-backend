@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 const User = require("../../Models/authModel");
+=======
+// const User = require("../../Models/profileModel");
+const User = require('../../Models/authModel');
+>>>>>>> 4a62ee1b59c6ffc769d236d8c316804fe16e405b
 const Dish = require("../../Models/dishModel")
 const mongoose = require('mongoose');
 const uploadImage = require("../../Database/uploadImage");
@@ -6,16 +11,35 @@ const uploadImage = require("../../Database/uploadImage");
 
 exports.get_all_users = async (req, res, next) => {
   try {
+<<<<<<< HEAD
     const users = await User.find().populate('profile').select('_id method local.email');
     res.json(users);
+=======
+    const users = await User.find({}).populate("Profile").select('_id method local.email');
+    res.status(200).json({
+      status: "success",
+      error: "",
+      results: users.length, 
+      data: {
+        users
+      }
+    });
+>>>>>>> 4a62ee1b59c6ffc769d236d8c316804fe16e405b
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ 
+      status: "fail",
+      error: err.message 
+    });
   }
 };
 
 exports.get_user_by_id = async (req, res, next) => {
   try {
+<<<<<<< HEAD
     const user = await User.findOne({_id: req.params.id}).populate("profile").select('_id method local.email')
+=======
+    const user = await User.findOne({_id: req.params.id}).populate("Profile").select('_id method local.email')
+>>>>>>> 4a62ee1b59c6ffc769d236d8c316804fe16e405b
     if(user){
       res.status(200).json({
         status: "success",
