@@ -7,7 +7,14 @@ const uploadImage = require("../../Database/uploadImage");
 exports.get_all_users = async (req, res, next) => {
   try {
     const users = await User.find().populate('profile').select('_id method local.email');
-    res.json(users);
+    res.status(200).json({
+      status:"success",
+      error: "",
+      results: users.length,
+      data: {
+        users
+      }
+    });
   } catch (err) {
     res.status(500).json({ 
       status: "fail",

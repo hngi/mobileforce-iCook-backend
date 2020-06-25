@@ -60,7 +60,8 @@ module.exports = {
     const token = signToken(newUser);
     // Respond with token
     return res.status(200).json({
-      status: "success", 
+      status: "success",
+      error: "",
       message: "user successfully registered!", 
       data: { 
         userID: newUser._id,
@@ -72,7 +73,7 @@ module.exports = {
     });
     }
     catch(error){
-      return res.status(400).json({status: "fail", message: error.message});
+      return res.status(400).json({status: "fail", error: error.message});
     }
   },  
 
