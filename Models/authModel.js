@@ -7,12 +7,14 @@ const userSchema = new Schema({
   method: {
     type: String,
     enum: ['local', 'google', 'facebook'],
-    required: true,
   },
   local: {
     email: {
       type: String,
       lowercase: true,
+    },
+    password: {
+      type: String,
     },
     password: {
       type: String,
@@ -36,9 +38,12 @@ const userSchema = new Schema({
       lowercase: true,
     },
   },
-  user: {
-    id: Schema.Types.ObjectId,
-  },
+  profile: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'profile',
+    },
+  ],
 });
 
 userSchema.pre('save', async function (next) {
@@ -61,7 +66,7 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-userSchema.methods.isValidPassword = async function (newPassword) {
+userSchema.methods.isValidPassword = async function (newPassword, res) {
   try {
     return await bcrypt.compare(newPassword, this.local.password);
   } catch (error) {
