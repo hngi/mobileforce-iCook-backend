@@ -36,10 +36,11 @@ const userSchema = new Schema({
       lowercase: true
     }
   },
-  profile: {
-    id: Schema.Types.ObjectId,
+  profile: [{
+    type: Schema.Types.ObjectId,
+    ref: "profile"
     
-  }
+  }]
 });
 
 userSchema.pre('save', async function(next) {

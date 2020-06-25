@@ -36,26 +36,22 @@ module.exports = {
     
 
     // Create a new user
-    const profileID = mongoose.Types.ObjectId();
     const newUser = new User({ 
       method: 'local',
       local: {
         email: email, 
         password: password,
-      },
-      profile: {
-        id: profileID,
       }
     });
     //create new profile for new user
-    const newProfile = new Profile({
-      _id: profileID, 
+    const profile = new Profile({
       email: email,
       name: name,
       phoneNumber: phone,
       gender: gender  
     });
-    await newProfile.save();
+    await profile.save();
+    await newUser.profile.push(profile);
     await newUser.save();
     
 
@@ -67,15 +63,15 @@ module.exports = {
       message: "user successfully registered!", 
       data: { 
         userID: newUser._id,
-        profileID: newUser.profile.id,
+        profileID: profile._id,
         email: newUser.local.email, 
-        name: newProfile.name,
+        name: profile.name,
         phone: newUser.local.phone
       }
     });
     }
     catch(error){
-      return res.status(400).json({status: "fail", error: error});
+      return res.status(400).json({status: "fail", message: error.message});
     }
   },  
 
@@ -107,7 +103,6 @@ module.exports = {
 
   googleOAuth: async (req, res, next) => {
     // Generate token
-    // console.log('got here');
     try{
       const token = signToken(req.user);
       res.header("x-auth-token", token)
@@ -132,8 +127,6 @@ module.exports = {
   },
 
   facebookOAuth: async (req, res, next) => {
-    // console.log('got here');
-    // console.log('req.user', req.user);
     try{
       const token = signToken(req.user);
       res.header("x-auth-token", token)

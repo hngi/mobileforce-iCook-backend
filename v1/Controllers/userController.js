@@ -1,4 +1,4 @@
-const User = require("../../Models/profileModel");
+const User = require("../../Models/authModel");
 const Dish = require("../../Models/dishModel")
 const mongoose = require('mongoose');
 const uploadImage = require("../../Database/uploadImage");
@@ -6,7 +6,7 @@ const uploadImage = require("../../Database/uploadImage");
 
 exports.get_all_users = async (req, res, next) => {
   try {
-    const users = await User.find();
+    const users = await User.find().populate('profile').select('_id method local.email');
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -14,19 +14,30 @@ exports.get_all_users = async (req, res, next) => {
 };
 
 exports.get_user_by_id = async (req, res, next) => {
-  const doesUserExist = await User.exists({_id: req.params.id});
-  if(doesUserExist){
-    try {
-        const user = await User.findOne({_id: req.params.id})
-        res.json(user)
-    } catch (err) {
-        res.status(500).json({message: err.message})
-    }
-} else {
-    res.status(404).json({message: `user with ID of ${req.params.id} not found`})
-}  
+  try {
+    const user = await User.findOne({_id: req.params.id}).populate("profile").select('_id method local.email')
+    if(user){
+      res.status(200).json({
+        status: "success",
+        error: "",
+        results: user.length,
+        data: {
+          user
+        }
+      })
+    } else{
+      return res.status(400).json({
+        status: "fail",
+        error: `user with ID ${req.params.id} not found`
+      })
+    }  
+  } 
+  catch (err) {
+    res.status(500).json({
+      status: "fail",
+      error: err.message});
+  }
 }
-
 //patch request
 //endpoint : /api/users/{id}/favourites - patch request
 exports.update_user_favourites = (req, res, next) => {
