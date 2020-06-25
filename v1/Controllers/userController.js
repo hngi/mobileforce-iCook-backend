@@ -120,6 +120,7 @@ exports.get_followers = async (req, res, next) => {
 
     if (!user) {
       return res.status(404).json({
+        status: fail,
         message: 'User not found',
       });
     }
@@ -134,6 +135,7 @@ exports.get_followers = async (req, res, next) => {
     });
   } catch (err) {
     return res.status(500).json({
+      status: fail,
       error: err,
     });
   }
@@ -146,6 +148,7 @@ exports.get_following = async (req, res, next) => {
 
     if (!user) {
       return res.status(404).json({
+        status: fail,
         message: 'User not found',
       });
     }
@@ -160,6 +163,7 @@ exports.get_following = async (req, res, next) => {
     });
   } catch (err) {
     return res.status(500).json({
+      status: fail,
       error: err,
     });
   }
@@ -177,7 +181,7 @@ exports.followUser = async (req, res, next) => {
 
   if (isMatch) {
     return res.status(400).json({
-      success: false,
+      status: fail,
       message: `You are already following user with ID ${followId}`,
     });
   }
@@ -206,7 +210,7 @@ exports.followUser = async (req, res, next) => {
     });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ error: err });
+    return res.status(400).json({ status: fail, error: err });
   }
 };
 
@@ -222,7 +226,7 @@ exports.unfollowUser = async (req, res, next) => {
 
   if (!isMatch) {
     return res.status(400).json({
-      success: false,
+      status: fail,
       message: `You have already unfollowed user with ID ${unfollowId}`,
     });
   }
@@ -249,6 +253,6 @@ exports.unfollowUser = async (req, res, next) => {
       error: '',
     });
   } catch (err) {
-    return res.status(400).json({ error: err });
+    return res.status(400).json({ status: fail, error: err });
   }
 };
