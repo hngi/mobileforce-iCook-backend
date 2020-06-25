@@ -36,10 +36,11 @@ const userSchema = new Schema({
       lowercase: true
     }
   },
-  profile: {
-    id: Schema.Types.ObjectId,
+  profile: [{
+    type: Schema.Types.ObjectId,
+    ref: "profile"
     
-  }
+  }]
 });
 
 userSchema.pre('save', async function(next) {
@@ -62,7 +63,7 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-userSchema.methods.isValidPassword = async function(newPassword) {
+userSchema.methods.isValidPassword = async function(newPassword, res) {
   try {
     return await bcrypt.compare(newPassword, this.local.password);
   } catch(error) {

@@ -17,31 +17,38 @@ const profileSchema = new schema({
     enum: ["male", "female", "others"]
   },
   userImage: String,
-  country: String,
-  phoneNumber: String,
+  country: { 
+    type: String
+  },
+  phoneNumber: {
+    type: String
+  },
+  bio: {
+    type: String
+  },
   dishes: [{
-    type: schema.Types.ObjectId,
-    ref: "Profile"
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "dish"
   }], //array of dishes posted by this user
-  favourites: [{
-    type: schema.Types.ObjectId,
-    ref: "Dish"
+  favDishes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "dish"
   }], //array of dish IDs
   followers: [
     {
       name: String,
-      id: schema.Types.ObjectId,
+      id: mongoose.Schema.Types.ObjectId
     },
   ],
   following: [
     {
       name: String,
-      id: schema.Types.ObjectId,
+      id: mongoose.Schema.Types.ObjectId
     },
   ],
 });
 
-const Profile = mongoose.model("Profile", profileSchema);
+const Profile = mongoose.model("profile", profileSchema);
 
 
 module.exports = Profile;

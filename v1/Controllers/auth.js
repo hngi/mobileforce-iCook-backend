@@ -34,79 +34,122 @@ module.exports = {
       })
     }
     
-
-    // Create a new user
-    const profileID = mongoose.Types.ObjectId();
-    const newUser = new User({ 
-      method: 'local',
-      local: {
-        email: email, 
-        password: password,
-      },
-      profile: {
-        id: profileID,
-      }
-    });
-    //create new profile for new user
-    const newProfile = new Profile({
-      _id: profileID, 
+     //create new profile for new user
+    const profile = new Profile({ 
       email: email,
       name: name,
       phoneNumber: phone,
       gender: gender  
     });
-    await newProfile.save();
+
+    // Create a new user
+    const newUser = new User({ 
+      method: 'local',
+      local: {
+        email: email, 
+        password: password,
+      }
+    });
+    
+    await profile.save();
+    await newUser.profile.push(profile);
     await newUser.save();
     
 
     // Generate the token
     const token = signToken(newUser);
     // Respond with token
-    // res.status(200).json({ token });
     return res.status(200).json({
-      status: "success", 
+      status: "success",
+      error: "",
       message: "user successfully registered!", 
       data: { 
         userID: newUser._id,
-        profileID: newUser.profile.id,
+        profileID: profile._id,
         email: newUser.local.email, 
-        name: newProfile.name,
+        name: profile.name,
         phone: newUser.local.phone
       }
     });
     }
     catch(error){
-      res.status(400).json({status: "fail", message: error.message});
+      return res.status(400).json({status: "fail", error: error.message});
     }
-
   },  
 
   signIn: async (req, res, next) => {
     // Generate token
     console.log(req.user);
-    const token = signToken(req.user);
-    res.status(200).json({ user_id: req.user._id, token});
+    try{
+      const token = signToken(req.user);
+      res.header("x-auth-token", token)
+      .status(200)
+      .json({ 
+        status: "success",
+        error: "",
+        data: {
+          user_id: req.user._id, 
+          token
+        }
+      });
+    }
+    catch(error){
+      return res
+      .status(400)
+      .json({
+        status: "fail",
+        error: error
+      })
+    } 
   },
 
   googleOAuth: async (req, res, next) => {
     // Generate token
-    // console.log('got here');
     try{
       const token = signToken(req.user);
-      res.status(200).json({ user_id: req.user._id, token });
+      res.header("x-auth-token", token)
+      .status(200)
+      .json({ 
+        status: "success",
+        error: "",
+        data: {
+          user_id: req.user._id, 
+          token
+        }
+      });
     }
     catch(error){
-      console.log(error)
-      res.status(400).json({status: "fail", message: error.message});
+      return res
+      .status(400)
+      .json({
+        status: "fail", 
+        error: error
+      });
     }
-    
   },
 
   facebookOAuth: async (req, res, next) => {
-    // console.log('got here');
-    // console.log('req.user', req.user);
-    const token = signToken(req.user);
-    res.status(200).json({ user_id: req.user._id, token });
-  }
-
+    try{
+      const token = signToken(req.user);
+      res.header("x-auth-token", token)
+      .status(200)
+      .json({ 
+        status: "success",
+        error: "",
+        data: {
+          user_id: req.user._id, 
+          token 
+        }
+        
+      });
+    }
+    catch(error){
+      return res
+      .status(400)
+      .json({
+        status: "fail", 
+        error: error
+      });
+    }
+  },
 }
