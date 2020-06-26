@@ -1,4 +1,3 @@
-require('dotenv').config();
 const JWT = require('jsonwebtoken');
 const Profile = require('../../Models/profileModel');
 const User = require('../../Models/authModel');
