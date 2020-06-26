@@ -94,7 +94,4 @@ exports.get_dishes_by_ID = async (req, res, next) => {
   }
 };
 
-
-exports.delete_dish = (req, res, next) => {
-
-}
+exports.delete_dish = (req, res, next) => {};

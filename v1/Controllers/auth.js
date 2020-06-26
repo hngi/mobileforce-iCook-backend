@@ -1,19 +1,20 @@
 require('dotenv').config();
 const JWT = require('jsonwebtoken');
-const Profile = require("../../Models/profileModel")
+const Profile = require('../../Models/profileModel');
 const User = require('../../Models/authModel');
 const mongoose = require('mongoose');
 
-
-
-signToken = user => {
-  return JWT.sign({
-    iss: 'CodeWorkr',
-    sub: user.id,
-    iat: new Date().getTime(), // current time
-    exp: new Date().setDate(new Date().getDate() + 1) // current time + 1 day ahead
-  }, process.env.JWT_SECRET);
-}
+signToken = (user) => {
+  return JWT.sign(
+    {
+      iss: 'CodeWorkr',
+      sub: user.id,
+      iat: new Date().getTime(), // current time
+      exp: new Date().setDate(new Date().getDate() + 1), // current time + 1 day ahead
+    },
+    process.env.JWT_SECRET
+  );
+};
 
 module.exports = {
   signUp: async (req, res, next) => {
