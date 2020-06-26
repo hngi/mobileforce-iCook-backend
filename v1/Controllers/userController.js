@@ -120,6 +120,7 @@ exports.get_followers = async (req, res, next) => {
 
     if (!user) {
       return res.status(404).json({
+        status: fail,
         message: 'User not found',
       });
     }
@@ -127,11 +128,14 @@ exports.get_followers = async (req, res, next) => {
     const followers = user.followers;
 
     res.status(200).json({
-      success: true,
+      status: success,
+      count: followers.length,
       data: followers,
+      error: '',
     });
   } catch (err) {
     return res.status(500).json({
+      status: fail,
       error: err,
     });
   }
@@ -144,6 +148,7 @@ exports.get_following = async (req, res, next) => {
 
     if (!user) {
       return res.status(404).json({
+        status: fail,
         message: 'User not found',
       });
     }
@@ -151,11 +156,14 @@ exports.get_following = async (req, res, next) => {
     const following = user.following;
 
     res.status(200).json({
-      success: true,
+      status: success,
+      count: following.length,
       data: following,
+      error: '',
     });
   } catch (err) {
     return res.status(500).json({
+      status: fail,
       error: err,
     });
   }
@@ -164,7 +172,7 @@ exports.get_following = async (req, res, next) => {
 // /api/users/id/follow/ - put
 exports.followUser = async (req, res, next) => {
   const followId = req.body.followId.toString();
-  const id = req.user.user.id.toString();
+  const id = req.user.profile.id.toString();
 
   const user = await User.findById(id);
   const following = user.following;
@@ -173,7 +181,7 @@ exports.followUser = async (req, res, next) => {
 
   if (isMatch) {
     return res.status(400).json({
-      success: false,
+      status: fail,
       message: `You are already following user with ID ${followId}`,
     });
   }
@@ -196,19 +204,20 @@ exports.followUser = async (req, res, next) => {
     );
 
     res.status(200).json({
-      success: true,
+      status: success,
       message: `You have successfully followed user with ID ${followId} `,
+      error: '',
     });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ error: err });
+    return res.status(400).json({ status: fail, error: err });
   }
 };
 
 // /api/users/id/unfollow - put
 exports.unfollowUser = async (req, res, next) => {
   const unfollowId = req.body.unfollowId.toString();
-  const id = req.user.user.id.toString();
+  const id = req.user.profile.id.toString();
 
   const user = await User.findById(id);
   const following = user.following;
@@ -217,7 +226,7 @@ exports.unfollowUser = async (req, res, next) => {
 
   if (!isMatch) {
     return res.status(400).json({
-      success: false,
+      status: fail,
       message: `You have already unfollowed user with ID ${unfollowId}`,
     });
   }
@@ -241,8 +250,9 @@ exports.unfollowUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: `You have successfully unfollowed user with ID ${unfollowId} `,
+      error: '',
     });
   } catch (err) {
-    return res.status(400).json({ error: err });
+    return res.status(400).json({ status: fail, error: err });
   }
 };
