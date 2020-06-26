@@ -14,10 +14,10 @@ router.get('/', user_controller.get_all_users)
 router.get('/:id', user_controller.get_user_by_id)
 
 //update user favourite
-router.patch('/:id/favourites', user_controller.update_user_favourites)
+// router.patch('/:id/favourites', user_controller.update_user_favourites)
 
 //update user's list of dishes (add a dish)
 //api/v1/users/:id/dishes
-router.patch('/:id/dishes', upload.single('dishImage'), user_controller.add_dish)
+// router.patch('/:id/dishes', upload.single('dishImage'), user_controller.add_dish)
 
 module.exports = router;
