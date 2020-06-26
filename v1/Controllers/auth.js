@@ -68,6 +68,7 @@ module.exports = {
       error: "",
       message: "user successfully registered!", 
       data: { 
+        token: token,
         userID: newUser._id,
         profileID: profile._id,
         email: newUser.local.email, 
