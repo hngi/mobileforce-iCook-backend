@@ -14,6 +14,6 @@ router.get('/', dish_controller.get_all_dishes)
 router.get('/:id', dish_controller.get_dishes_by_ID);
 
 // delete a dish by id
-router.delete('/:id', passportJWT, dish_controller.deleteDish);
+
 
 module.exports = router;
