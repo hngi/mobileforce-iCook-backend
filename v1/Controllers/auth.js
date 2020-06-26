@@ -30,8 +30,8 @@ module.exports = {
     }
     if (!(name && phone && gender && email && password)) {
       return res.status(400).json({
-        error: "name, email, passoword, phone and gender fields are required"
-      })
+        error: "name, email, password, phone and gender fields are required"
+      });
     }
     
      //create new profile for new user
