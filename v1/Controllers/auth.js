@@ -2,7 +2,6 @@ require('dotenv').config();
 const JWT = require('jsonwebtoken');
 const Profile = require('../../Models/profileModel');
 const User = require('../../Models/authModel');
-const mongoose = require('mongoose');
 
 signToken = (user) => {
   return JWT.sign(
@@ -28,10 +27,10 @@ module.exports = {
     const facebookUser = await User.findOne({"facebook.email": email});
     if (foundUser || existingUser || facebookUser) { 
       return res.status(403).json({ error: 'Email is already in use'});
-    } 
-    if (!name || !phone || !gender) {
+    }
+    if (!(name && phone && gender && email && password)) {
       return res.status(400).json({
-        error: "name, phone and gender fields are required"
+        error: "name, email, passoword, phone and gender fields are required"
       })
     }
     
@@ -69,7 +68,8 @@ module.exports = {
         profileID: profile._id,
         email: newUser.local.email, 
         name: profile.name,
-        phone: newUser.local.phone
+        phone: newUser.local.phone,
+        token
       }
     });
     }
