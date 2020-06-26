@@ -21,7 +21,7 @@ app.use(cors())
 
 
 mongoose.connect(
-  process.env.MONGODB_URI || "mongodb://localhost/iCook",
+  process.env.MONGODB_URI || "mongodb+srv://admin-babslaw:babalola1996@cluster0-hthp7.mongodb.net/iCook?retryWrites=true&w=majority",
   { useNewUrlParser: true, useUnifiedTopology: true }
 );
 const db = mongoose.connection;
