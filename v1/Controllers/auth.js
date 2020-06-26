@@ -29,17 +29,10 @@ module.exports = {
     }
     if (!(name && phone && gender && email && password)) {
       return res.status(400).json({
+        status: "fail",
         error: "name, email, password, phone and gender fields are required"
       });
     }
-    
-     //create new profile for new user
-    const profile = new Profile({ 
-      email: email,
-      name: name,
-      phoneNumber: phone,
-      gender: gender  
-    });
 
     // Create a new user
     const newUser = new User({ 
@@ -49,10 +42,20 @@ module.exports = {
         password: password,
       }
     });
+
+    const profile = new Profile({ 
+      userId: newUser._id,
+      email: email,
+      name: name,
+      phoneNumber: phone,
+      gender: gender  
+    });
     
     await profile.save();
     await newUser.profile.push(profile);
     await newUser.save();
+    // await profile.userId.push(newUser._id);
+    console.log(newUser._id);
     
 
     // Generate the token
@@ -63,6 +66,7 @@ module.exports = {
       error: "",
       message: "user successfully registered!", 
       data: { 
+        token: token,
         userID: newUser._id,
         profileID: profile._id,
         email: newUser.local.email, 
@@ -98,7 +102,7 @@ module.exports = {
       .status(400)
       .json({
         status: "fail",
-        error: error
+        error: error.message
       })
     } 
   },
@@ -123,7 +127,7 @@ module.exports = {
       .status(400)
       .json({
         status: "fail", 
-        error: error
+        error: error.message
       });
     }
   },
@@ -148,7 +152,7 @@ module.exports = {
       .status(400)
       .json({
         status: "fail", 
-        error: error
+        error: error.message
       });
     }
   },

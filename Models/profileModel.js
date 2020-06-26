@@ -3,6 +3,10 @@ const schema = mongoose.Schema;
 const { ObjectId } = mongoose.Schema.Types;
 
 const profileSchema = new schema({
+  userId: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user'
+  }],
   name: {
     type: String,
     trim: true,

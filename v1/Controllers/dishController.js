@@ -1,83 +1,97 @@
-const Dish = require('../../Models/dishModel');
-const User = require('../../Models/profileModel');
-const uploadImage = require('../../Database/uploadImage');
+const Dish = require("../../Models/dishModel");
+const uploadImage = require("../../Database/uploadImage");
+const Profile = require("../../Models/profileModel");
+const User = require('../../Models/authModel');
+
+
+exports.createDish = async(req, res, next) => {
+  try{
+    const{
+      name,
+      recipe,
+      healthBenefits,
+      ingredients,
+      chefName
+    } = req.body;
+
+    const userId = req.params.id;
+    
+
+    const dish = new Dish({
+      name: name,
+      recipe: recipe,
+      healthBenefits: healthBenefits,
+      ingredients: ingredients,
+      chefName: chefName
+    });
+
+    const findProfile = await User.findById(userId).populate('profile');
+    // console.log(findProfile.profile[0]._id);
+
+    const profileId = findProfile.profile[0]._id
+
+    const profile = await Profile.findByIdAndUpdate(profileId, {$push: { dishes: dish}}, {new: true, useFindAndModify: false });
+    await dish.save();
+    return res.status(200).json({
+      status: "success",
+      error: "",
+      message: "dish saved successfully!"
+    });
+
+  }
+  catch(error){
+    res.status(400).json({
+      status: "fail",
+      error: error.message
+    })
+  }
+}
 
 exports.get_all_dishes = async (req, res, next) => {
-  res.header('Content-Type', 'application/json');
+  
   try {
     const dishes = await Dish.find();
-    res.send(JSON.stringify(dishes, null, 4));
-  } catch (err) {
-    res.status(500).send(JSON.stringify({ message: err.message }, null, 4));
+    return res.status(200).json({
+      status: "success",
+      error: "",
+      results: dishes.length,
+      data: {
+        dishes
+      }
+    })
+  } 
+  catch (error) {
+    return res.status(400).json({
+      status: "fail",
+      error: error.message
+    })
   }
 };
 
 exports.get_dishes_by_ID = async (req, res, next) => {
-  //to be refactored
-  const doesDishExist = await Dish.exists({ _id: req.params.id });
-  if (doesDishExist) {
-    try {
-      const dish = await Dish.findOne({ _id: req.params.id });
-      res.json(dish);
-    } catch (err) {
-      res.status(500).json({ message: err.message });
+  try{
+    const dish = await Dish.findById({_id: req.params.id});
+    if(dish){
+      res.status(200).json({
+        status: "success",
+        error: "",
+        data: {
+          dish
+        }
+      })
+    } else {
+      return res.status(400).json({
+        status: "fail",
+        error: `dish with ID ${req.params.id} not found`
+      })
     }
-  } else {
-    res.status(404).json({ message: `dish with ID of ${req.params.id} not found` });
+  }
+  catch(error){
+    return res.status(400).json({
+      status: "fail",
+      error: error.message
+    })
   }
 };
-
-// /api/v1/dishes/:dishId
-exports.deleteDish = async (req, res, next) => {
-  const dishId = req.params.id;
-  const user = req.user;
-
-  const dish = await Dish.findById(dishId);
-  if (!dish) {
-    return res.status(404).json({
-      message: 'Dish not found',
-    });
-  }
-
-  await dish.remove();
-  res.status(200).json({
-    message: 'Dish removed',
-  });
-};
-
-//moved to userController
-/*exports.add_dish = async (req, res, next) => {
-  const {
-    chef,
-    name,
-    description,
-    ingredients,
-    steps,
-    healthBenefits,
-  } = req.body;
-  const dishImages = req.files;
-  const dishImagesLinks = [];
-
-  try {
-    dishImages.forEach((dishImage) => {
-      dishImagesLinks.push(uploadImage(dishImage));
-    });
-    console.log(dishImagesLinks);
-    const newDish = new Dish({
-      chef,
-      name,
-      chefImage,
-      dishImages,
-      description,
-      ingredients,
-      steps,
-      healthBenefits,
-    });
-    await newDish.save();
-    res.status(201);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};*/
 
 exports.delete_dish = (req, res, next) => {};

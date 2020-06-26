@@ -5,6 +5,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const GooglePlusTokenStrategy = require('passport-google-plus-token');
 const FacebookTokenStrategy = require('passport-facebook-token');
 const User = require('./Models/authModel');
+const Profile = require('./Models/profileModel');
 
 // JSON WEB TOKENS STRATEGY
 passport.use(
@@ -48,6 +49,8 @@ passport.use(
         console.log('profile', profile);
         console.log('accessToken', accessToken);
         console.log('refreshToken', refreshToken);
+        const name = profile.name.givenName+ " "+profile.name.familyName
+        console.log(name);
 
         const existingUser = await User.findOne({ 'google.id': profile.id });
         if (existingUser) {
@@ -62,6 +65,17 @@ passport.use(
           },
         });
 
+        const newProfile = new Profile({
+          userId: newUser._id,
+          email: profile.emails[0].value,
+          name: name,
+          gender: "others"
+        });
+
+        await newProfile.save();
+        done(null, newProfile);
+
+        await newUser.profile.push(newProfile);
         await newUser.save();
         done(null, newUser);
       } catch (error) {
