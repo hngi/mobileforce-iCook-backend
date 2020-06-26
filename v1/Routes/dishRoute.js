@@ -6,7 +6,10 @@ const user_controller = require('../Controllers/userController');
 const passport = require('passport');
 const passportJWT = passport.authenticate('jwt', { session: false });
 
-router.get('/', dish_controller.get_all_dishes);
+router.post('/:id', dish_controller.createDish);
+
+router.get('/', dish_controller.get_all_dishes)
+
 
 router.get('/:id', dish_controller.get_dishes_by_ID);
 
