@@ -145,7 +145,7 @@ passport.use(
           return done(null, false);
         }
 
-        done(none, user);
+        done(undefined, user);
       } catch (error) {
         done(error, false);
       }

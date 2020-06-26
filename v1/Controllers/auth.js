@@ -61,7 +61,9 @@ module.exports = {
     // Generate the token
     const token = signToken(newUser);
     // Respond with token
-    return res.status(200).json({
+    return res.status(200)
+    .header("x-auth-token", token)
+    .json({
       status: "success",
       error: "",
       message: "user successfully registered!", 
