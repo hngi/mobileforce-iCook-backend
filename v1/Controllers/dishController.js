@@ -11,31 +11,31 @@ exports.createDish = async(req, res, next) => {
       recipe,
       healthBenefits,
       ingredients,
-      chefName
     } = req.body;
 
-    const userId = req.params.id;
-    
+    const userId = req.user._id;
 
     const dish = new Dish({
       name: name,
       recipe: recipe,
       healthBenefits: healthBenefits,
       ingredients: ingredients,
-      chefName: chefName
+      chefId: userId
     });
 
     const findProfile = await User.findById(userId).populate('profile');
-    // console.log(findProfile.profile[0]._id);
 
     const profileId = findProfile.profile[0]._id
 
-    const profile = await Profile.findByIdAndUpdate(profileId, {$push: { dishes: dish}}, {new: true, useFindAndModify: false });
+    await Profile.findByIdAndUpdate(profileId, {$push: { dishes: dish}}, {new: true, useFindAndModify: false });
     await dish.save();
-    return res.status(200).json({
+    return res.status(201).json({
       status: "success",
       error: "",
-      message: "dish saved successfully!"
+      message: "dish saved successfully!",
+      data: {
+        dish
+      }
     });
 
   }
@@ -48,9 +48,8 @@ exports.createDish = async(req, res, next) => {
 }
 
 exports.get_all_dishes = async (req, res, next) => {
-  
   try {
-    const dishes = await Dish.find();
+    const dishes = await Dish.find({chefId: req.user._id});
     return res.status(200).json({
       status: "success",
       error: "",
@@ -61,7 +60,7 @@ exports.get_all_dishes = async (req, res, next) => {
     })
   } 
   catch (error) {
-    return res.status(400).json({
+    return res.status(404).json({
       status: "fail",
       error: error.message
     })
@@ -70,7 +69,7 @@ exports.get_all_dishes = async (req, res, next) => {
 
 exports.get_dishes_by_ID = async (req, res, next) => {
   try{
-    const dish = await Dish.findById({_id: req.params.id});
+    const dish = await Dish.findById(req.params.id);
     if(dish){
       res.status(200).json({
         status: "success",
@@ -78,20 +77,31 @@ exports.get_dishes_by_ID = async (req, res, next) => {
         data: {
           dish
         }
-      })
+      });
     } else {
-      return res.status(400).json({
+      throw new Error('Not found');
+    }
+  } catch(error){
+      return res.status(404).json({
         status: "fail",
         error: `dish with ID ${req.params.id} not found`
       })
-    }
-  }
-  catch(error){
-    return res.status(400).json({
-      status: "fail",
-      error: error.message
-    })
   }
 };
 
-exports.delete_dish = (req, res, next) => {};
+// Delete operation should be idempotent
+exports.delete_dish = async (req, res, next) => {
+  try {
+    const data = await Dish.deleteOne({id: req.params.id});
+    res.status(200).json({
+      status: "success",
+      error: "",
+      data
+    });
+  } catch(error) {
+    return res.status(400).json({
+      status: "fail",
+      error: error.message
+    });
+  }
+};
