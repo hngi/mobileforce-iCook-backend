@@ -15,5 +15,7 @@ router.delete('/:id', passportJWT, dish_controller.delete_dish);
 
 router.put('/toggle_like/:id', passportJWT, dish_controller.toggle_like);
 
+router.put('/toggle_favourite/:id', passportJWT, dish_controller.toggle_favorite);
+
 
 module.exports = router;

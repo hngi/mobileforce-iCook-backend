@@ -150,3 +150,41 @@ exports.toggle_like = async (req, res) => {
     });
   }
 };
+
+// @Usman Jun 27
+exports.toggle_favorite = async (req, res) => {
+  try {
+    const dishId = req.params.id;
+    const dish = await Dish.findOne({_id: dishId});
+    if (!dish) {
+      throw new Error('Not found');
+    }
+    const me = await Profile.findOne({
+      userId: req.user._id
+    });
+    const isFavorite = me.favourites && me.favourites.includes(dishId);
+
+    if (isFavorite) {
+      me.favourites = me.favourites.filter(id => id.toString() !== dishId);
+    } else {
+      me.favourites.push(dishId);
+    };
+    me.save();
+
+    return res.status(200).json({
+      status: 'success',
+      error: '',
+      data: {
+        dish: {
+          _id: dishId,
+          isFavorite: !isFavorite
+        }
+      }
+    });
+  } catch(error) {
+    return res.status(400).json({
+      status: 'fail',
+      error: error.message
+    });
+  }
+};

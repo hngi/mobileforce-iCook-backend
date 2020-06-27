@@ -28,7 +28,7 @@ exports.get_all_users = async (req, res, next) => {
 exports.get_user_by_id = async (req, res, next) => {
   try {
     const userId = req.params.id; 
-    const user = await Profile.findOne({userId}).select(['-email', '-favDishes', '-favourites']).populate('dishes');
+    const user = await Profile.findOne({userId}).select(['-email', '-favourites']).populate('dishes');
     const _user = PublicResponse.user(user, req);
 
     if(user){
