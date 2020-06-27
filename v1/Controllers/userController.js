@@ -68,7 +68,7 @@ exports.get_followers = async (req, res, next) => {
     });
   } catch (err) {
     return res.status(404).json({
-      status: fail,
+      status: 'fail',
       message: 'User not found',
     });
   }
@@ -93,7 +93,7 @@ exports.get_following = async (req, res, next) => {
     });
   } catch (err) {
     return res.status(404).json({
-      status: fail,
+      status: 'fail',
       message: 'User not found',
     });
   }
@@ -101,23 +101,26 @@ exports.get_following = async (req, res, next) => {
 
 // /api/users/follow/:id - put
 exports.followUser = async (req, res, next) => {
-  const followId = req.params.id;
-  const id = req.user.profile.id.toString();
-
-  const user = await User.findById(id);
-  const following = user.following;
-
-  const isMatch = following.some((fol) => fol == followId);
-
-  if (isMatch) {
-    // idempotent mutation
-    return res.status(200).json({
-      status: fail,
-      message: `You are already following user with ID ${followId}`,
-    });
-  }
-
   try {
+    const followId = req.params.id;
+    const id = req.user._id.toString();
+    if (id === followId) {
+      throw new Error('You cant follow your self');
+    }
+
+    const user = await User.findById(id);
+    const following = user.following;
+
+    const isMatch = following.some((fol) => fol == followId);
+
+    if (isMatch) {
+      // idempotent mutation
+      return res.status(200).json({
+        status: 'fail',
+        message: `You are already following user with ID ${followId}`,
+      });
+    }
+
     await User.findByIdAndUpdate(
       followId,
       {
@@ -140,29 +143,33 @@ exports.followUser = async (req, res, next) => {
       error: '',
     });
   } catch (err) {
-    return res.status(400).json({ status: fail, error: err });
+    return res.status(400).json({ status: 'fail', error: err.message });
   }
 };
 
 // /api/users/unfollow/:id - put
 exports.unfollowUser = async (req, res, next) => {
-  const unfollowId = req.params.id;
-  const id = req.user.profile.id.toString();
-
-  const user = await User.findById(id);
-  const following = user.following;
-
-  const isMatch = following.find((fol) => fol == unfollowId);
-
-  if (!isMatch) {
-    // idempotent mutation
-    return res.status(200).json({
-      status: fail,
-      message: `You have already unfollowed user with ID ${unfollowId}`,
-    });
-  }
-
   try {
+    const unfollowId = req.params.id;
+    const id = req.user._id.toString();
+    
+    if (id === unfollowId) {
+      throw new Error('You cant unfollow your self');
+    }
+
+    const user = await User.findById(id);
+    const following = user.following;
+
+    const isMatch = following.find((fol) => fol == unfollowId);
+
+    if (!isMatch) {
+      // idempotent mutation
+      return res.status(200).json({
+        status: 'fail',
+        message: `You have already unfollowed user with ID ${unfollowId}`,
+      });
+    }
+
     await User.findByIdAndUpdate(
       unfollowId,
       {
@@ -184,6 +191,6 @@ exports.unfollowUser = async (req, res, next) => {
       error: '',
     });
   } catch (err) {
-    return res.status(400).json({ status: fail, error: err });
+    return res.status(400).json({ status: 'fail', error: err.message });
   }
 };
