@@ -28,13 +28,17 @@ exports.get_user_by_id = async (req, res, next) => {
   try {
     const userId = req.params.id; 
     const user = await Profile.findOne({userId}).populate('dishes');
+    const _user = Object.assign({}, {
+      ...user.toJSON(),
+      isFollowing: user._isFollowing(userId)
+    });
     if(user){
       res.status(200).json({
         status: 'success',
         error: '',
         results: user.length,
         data: {
-          user,
+          user: _user,
         }
       })
     } else{
@@ -109,7 +113,7 @@ exports.followUser = async (req, res, next) => {
     }
 
     const user = await User.findById(id);
-    const following = user.following;
+    const following = user.following || [];
 
     const isMatch = following.some((fol) => fol == followId);
 
@@ -158,7 +162,7 @@ exports.unfollowUser = async (req, res, next) => {
     }
 
     const user = await User.findById(id);
-    const following = user.following;
+    const following = user.following || [];
 
     const isMatch = following.find((fol) => fol == unfollowId);
 

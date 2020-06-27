@@ -59,6 +59,10 @@ const profileSchema = new schema({
   following: [{ type: ObjectId, ref: 'Profile' }],
 });
 
+profileSchema.methods._isFollowing = function (userId) {
+  return this.followers.includes(userId);
+}
+
 const Profile = mongoose.model('profile', profileSchema);
 
 module.exports = Profile;
