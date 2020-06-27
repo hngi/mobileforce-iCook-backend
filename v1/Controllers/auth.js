@@ -55,8 +55,6 @@ module.exports = {
     await newUser.profile.push(profile);
     await newUser.save();
     // await profile.userId.push(newUser._id);
-    console.log(newUser._id);
-    
 
     // Generate the token
     const token = signToken(newUser);
