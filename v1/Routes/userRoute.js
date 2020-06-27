@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const user_controller = require('../Controllers/userController');
-const multer = require('multer');
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+// const multer = require('multer');
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage: storage });
 
 const passport = require('passport');
 const passportJWT = passport.authenticate('jwt', { session: false });
