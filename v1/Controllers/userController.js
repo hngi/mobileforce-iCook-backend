@@ -33,7 +33,8 @@ exports.get_user_by_id = async (req, res, next) => {
       followersCount: user.followers ? user.followers.length : 0,
       followingCount: user.following ? user.following.length : 0,
       dishesCount: user.dishes ? user.dishes.length : 0,
-      isFollowing: user._isFollowing(userId)
+      isFollowing: user._isFollowing(userId),
+      me: userId === req.user._id.toString()
     });
     delete _user.followers;
     delete _user.following;
