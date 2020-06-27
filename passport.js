@@ -1,4 +1,3 @@
-require('dotenv').config();
 const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
 const { ExtractJwt } = require('passport-jwt');
@@ -74,13 +73,11 @@ passport.use(
         });
 
         await newProfile.save();
-        done(null, newProfile);
-
         await newUser.profile.push(newProfile);
         await newUser.save();
-        done(null, newUser);
+        return done(null, newUser);
       } catch (error) {
-        done(error, false, error.message);
+        return done(error, false, error.message);
       }
     }
   )
@@ -113,10 +110,20 @@ passport.use(
           },
         });
 
+        const newProfile = new Profile({
+          userId: newUser._id,
+          email: profile.emails[0].value,
+          name: profile.displayName,
+          gender: "others"
+        });
+
+        await newProfile.save();
+        await newUser.profile.push(newProfile);
         await newUser.save();
-        done(null, newUser);
+        console.log(newUser._id);
+        return done(null, newUser);
       } catch (error) {
-        done(error, false, error.message);
+        return done(error, false, error.message);
       }
     }
   )
@@ -146,7 +153,7 @@ passport.use(
           return done(null, false);
         }
 
-        done(none, user);
+        done(null, user);
       } catch (error) {
         done(error, false);
       }

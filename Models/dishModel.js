@@ -6,9 +6,6 @@ const dishSchema = new schema({
     type: String,
     required: true
   },
-  chefName: {
-    type: String
-  },
   chefId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "profile"
@@ -20,9 +17,7 @@ const dishSchema = new schema({
     type: [String]
   },
   likes: { 
-    type: Number, 
-    min: 0, 
-    default: 0 
+    type: [String] // You'll be able to make intelligent query based on user IDs
   },
   ingredients: {
     type: [String],
