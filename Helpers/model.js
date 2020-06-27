@@ -1,13 +1,13 @@
 // public response
 
 // @Usman Jun 27
-function _dish(dish, req) {
+function _dish(dish, req, extraData={}) {
   const d = Object.assign({}, {
     ...dish.toJSON(),
     commentsCount: dish.comments ? dish.comments.length : 0,
     likesCount: dish.likes.length,
     isLiked: dish._isLiked(req.user._id)
-  });
+  },extraData);
   delete d.likes;
   delete d.comments;
   return d;
@@ -36,6 +36,6 @@ function _user(user, req) {
 
 // @Usman Jun 27
 exports.users = (_users, req) => _users.map(u => _user(u, req));
-exports.dishes = (_dishes, req) => _dishes.map(d => _dish(d, req));
+exports.dishes = (_dishes, req, fn=() => undefined) => _dishes.map(d => _dish(d, req, fn(d._id.toString())));
 exports.dish = _dish;
 exports.user = _user;

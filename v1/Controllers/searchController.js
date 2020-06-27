@@ -28,6 +28,7 @@ exports.search = async (req, res) => {
       status: "success",
       error: "",
       data: {
+        count: result.length,
         result
       }
     });

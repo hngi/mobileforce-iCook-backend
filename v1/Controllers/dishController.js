@@ -51,7 +51,11 @@ exports.createDish = async(req, res, next) => {
 exports.get_all_dishes = async (req, res, next) => {
   try {
     const _dishes = await Dish.find({chefId: req.user._id});
-    const dishes = PublicResponse.dishes(_dishes, req); 
+    const me = await Profile.findOne({
+      userId: req.user._id
+    });
+    const isFavourite = id => ({ isFavourite: me.favourites.includes(id) });
+    const dishes = PublicResponse.dishes(_dishes, req, isFavourite); 
     return res.status(200).json({
       status: "success",
       error: "",
@@ -73,7 +77,11 @@ exports.get_dishes_by_ID = async (req, res, next) => {
   try{
     const dish = await Dish.findById(req.params.id);
     if(dish){
-      const d = PublicResponse.dish(dish, req); 
+      const me = await Profile.findOne({
+        userId: req.user._id
+      });
+      const isFavourite = me.favourites.includes(req.params.id);
+      const d = PublicResponse.dish(dish, req, { isFavourite }); 
       res.status(200).json({
         status: "success",
         error: "",
@@ -175,10 +183,7 @@ exports.toggle_favorite = async (req, res) => {
       status: 'success',
       error: '',
       data: {
-        dish: {
-          _id: dishId,
-          isFavorite: !isFavorite
-        }
+        dish: PublicResponse.dish(dish, req, {isFavorite: !isFavorite})
       }
     });
   } catch(error) {
