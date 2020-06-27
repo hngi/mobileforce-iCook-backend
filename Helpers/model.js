@@ -19,14 +19,15 @@ exports.dishes = (_dishes, req) => _dishes.map(d => _dish(d, req));
 
 // @Usman Jun 27
 function _user(user, req) {
-  const userId = req.params.id; 
+  const userId = user._id.toString(); 
+  const me = user.userId.includes(req.user._id.toString());
   const _user = Object.assign({}, {
     ...user.toJSON(),
     followersCount: user.followers ? user.followers.length : 0,
     followingCount: user.following ? user.following.length : 0,
     dishesCount: user.dishes ? user.dishes.length : 0,
     isFollowing: user._isFollowing(userId),
-    me: userId === req.user._id.toString()
+    me
   });
   delete _user.followers;
   delete _user.following;
