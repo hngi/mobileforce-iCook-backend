@@ -4,7 +4,7 @@ const PublicResponse = require('../../Helpers/model');
 
 exports.search = async (req, res) => {
   const query = req.query;
-  const { type, name } = query;
+  const { type, name, limit=20 } = query;
   let result = [];
   switch(type.toLowerCase()) {
     case 'dish': {
@@ -18,6 +18,11 @@ exports.search = async (req, res) => {
       break;
     }
   }
+
+  if (result.length) {
+    result = result.slice(0, limit);
+  }
+
   res.status(200)
     .json({ 
       status: "success",
