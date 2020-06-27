@@ -83,6 +83,7 @@ exports.get_dishes_by_ID = async (req, res, next) => {
     if(dish){
       const d = Object.assign({}, {
         ...dish.toJSON(),
+        commentsCount: dish.comments ? dish.comments.length : 0,
         likesCount: dish.likes.length,
         isLiked: dish._isLiked(req.user._id)
       });
