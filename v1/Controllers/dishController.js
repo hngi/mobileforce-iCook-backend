@@ -2,6 +2,7 @@ const Dish = require("../../Models/dishModel");
 const uploadImage = require("../../Database/uploadImage");
 const Profile = require("../../Models/profileModel");
 const User = require('../../Models/authModel');
+const PublicResponse = require('../../Helpers/model');
 
 
 exports.createDish = async(req, res, next) => {
@@ -50,16 +51,7 @@ exports.createDish = async(req, res, next) => {
 exports.get_all_dishes = async (req, res, next) => {
   try {
     const _dishes = await Dish.find({chefId: req.user._id});
-    const dishes = _dishes.map(dish => {
-      const d = Object.assign({}, {
-        ...dish.toJSON(),
-        likesCount: dish.likes.length,
-        isLiked : dish._isLiked(req.user._id)
-      });
-      delete d.likes;
-      delete d.comments;
-      return d;
-    });
+    const dishes = PublicResponse.dishes(_dishes, req); 
     return res.status(200).json({
       status: "success",
       error: "",
@@ -81,14 +73,7 @@ exports.get_dishes_by_ID = async (req, res, next) => {
   try{
     const dish = await Dish.findById(req.params.id);
     if(dish){
-      const d = Object.assign({}, {
-        ...dish.toJSON(),
-        commentsCount: dish.comments ? dish.comments.length : 0,
-        likesCount: dish.likes.length,
-        isLiked: dish._isLiked(req.user._id)
-      });
-      delete d.likes;
-      delete d.comments;
+      const d = PublicResponse.dish(dish, req); 
       res.status(200).json({
         status: "success",
         error: "",
@@ -149,12 +134,7 @@ exports.toggle_like = async (req, res) => {
       dish.likes.push(userId);
     }
     await dish.save();
-    const d = Object.assign({}, {
-      ...dish.toJSON(),
-      likesCount: dish.likes.length,
-      isLiked: dish._isLiked(userId)
-    });
-    delete d.likes;
+    const d = PublicResponse.dish(dish, req); 
     res.status(200).json({
       status: "success",
       error: "",
