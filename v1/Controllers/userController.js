@@ -8,7 +8,7 @@ const PublicResponse = require('../../Helpers/model');
 exports.get_all_users = async (req, res, next) => {
   try {
     // const users = await User.find().populate('profile').select('_id method local.email');
-    const users = await Profile.find().populate('dishes');
+    const users = await Profile.find().select('-email').populate('dishes');
     res.status(200).json({
       status: 'success',
       error: '',
