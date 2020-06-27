@@ -48,7 +48,6 @@ const userSchema = new Schema({
 
 userSchema.pre('save', async function (next) {
   try {
-    console.log('entered');
     if (this.method !== 'local') {
       next();
     }
