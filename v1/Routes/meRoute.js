@@ -2,10 +2,13 @@ const express = require('express');
 const router = express.Router();
 const me_controller = require('../Controllers/meController');
 
-router.get('/', passportJWT, me_controller.me);
+const passport = require('passport');
+const passportJWT = passport.authenticate('jwt', { session: false });
+
+router.get('/', passportJWT, me_controller.get_me);
 
 // get profile 
-router.get('/profile', passportJWT, me_controller.get_profile);
+router.get('/auth', passportJWT, me_controller.get_auth);
 
 // get favourites
 router.get('/favourites', passportJWT, me_controller.get_favourites);

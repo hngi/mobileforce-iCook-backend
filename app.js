@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cors());
 
-// app.use("/api/v1/me", require("./v1/Routes/meRoute")); - TODO
+app.use("/api/v1/me", require("./v1/Routes/meRoute"));
 app.use("/api/v1/users", require("./v1/Routes/userRoute"));
 app.use("/api/v1/dishes", require("./v1/Routes/dishRoute"));
 app.use("/api/v1/authenticate", require("./v1/Routes/authRoute"));
