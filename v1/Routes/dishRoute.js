@@ -13,5 +13,7 @@ router.get('/:id', passportJWT, dish_controller.get_dishes_by_ID);
 
 router.delete('/:id', passportJWT, dish_controller.delete_dish);
 
+router.put('/toggle_like/:id', passportJWT, dish_controller.toggle_like);
+
 
 module.exports = router;

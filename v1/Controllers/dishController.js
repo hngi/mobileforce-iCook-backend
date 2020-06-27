@@ -70,7 +70,6 @@ exports.get_all_dishes = async (req, res, next) => {
 exports.get_dishes_by_ID = async (req, res, next) => {
   try{
     const dish = await Dish.findById(req.params.id).select('-likes');
-    const userId = req.user._id;
     if(dish){
       res.status(200).json({
         status: "success",
@@ -109,6 +108,36 @@ exports.delete_dish = async (req, res, next) => {
     });
   } catch(error) {
     const code = error.message === 'Unauthorized' ? 403 : 400;
+    return res.status(code).json({
+      status: "fail",
+      error: error.message
+    });
+  }
+};
+
+exports.toggle_like = async (req, res) => {
+  try {
+    const dish = await Dish.findOne({_id: req.params.id});
+    if (!dish) {
+      throw new Error('Not found');
+    }
+    const userId = req.user._id.toString();
+    const isLiked = dish.likes.includes(userId);
+    if (isLiked) {
+      dish.likes = dish.likes.filter(id => userId !== id);
+    } else {
+      dish.likes.push(userId);
+    }
+    await dish.save();
+    res.status(200).json({
+      status: "success",
+      error: "",
+      data: {
+        dish
+      }
+    });
+  } catch(error) {
+    const code = error.message === 'Not found' ? 404 : 400;
     return res.status(code).json({
       status: "fail",
       error: error.message
