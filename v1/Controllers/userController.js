@@ -2,6 +2,7 @@ const User = require('../../Models/authModel');
 const Dish = require('../../Models/dishModel');
 const uploadImage = require('../../Database/uploadImage');
 const Profile = require("../../Models/profileModel");
+const PublicResponse = require('../../Helpers/model');
 
 
 exports.get_all_users = async (req, res, next) => {
@@ -28,16 +29,7 @@ exports.get_user_by_id = async (req, res, next) => {
   try {
     const userId = req.params.id; 
     const user = await Profile.findOne({userId}).select(['-email', '-favDishes', '-favourites']).populate('dishes');
-    const _user = Object.assign({}, {
-      ...user.toJSON(),
-      followersCount: user.followers ? user.followers.length : 0,
-      followingCount: user.following ? user.following.length : 0,
-      dishesCount: user.dishes ? user.dishes.length : 0,
-      isFollowing: user._isFollowing(userId),
-      me: userId === req.user._id.toString()
-    });
-    delete _user.followers;
-    delete _user.following;
+    const _user = PublicResponse.user(user, req);
 
     if(user){
       res.status(200).json({

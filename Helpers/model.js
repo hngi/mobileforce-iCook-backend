@@ -27,3 +27,19 @@ exports.dishes = (_dishes, req) => {
   });
   return dishes;
 };
+
+// @Usman Jun 27
+exports.user = (user, req) => {
+  const userId = req.params.id; 
+  const _user = Object.assign({}, {
+    ...user.toJSON(),
+    followersCount: user.followers ? user.followers.length : 0,
+    followingCount: user.following ? user.following.length : 0,
+    dishesCount: user.dishes ? user.dishes.length : 0,
+    isFollowing: user._isFollowing(userId),
+    me: userId === req.user._id.toString()
+  });
+  delete _user.followers;
+  delete _user.following;
+  return _user;
+};
