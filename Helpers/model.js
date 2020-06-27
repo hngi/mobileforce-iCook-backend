@@ -31,6 +31,9 @@ function _user(user, req) {
   });
   delete _user.followers;
   delete _user.following;
+  delete _user.dishes;
+  delete _user.favDishes;
+  delete _user.favourites;
   return _user;
 };
 exports.user = _user;
