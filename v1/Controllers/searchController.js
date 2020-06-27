@@ -5,7 +5,7 @@ const Profile = require("../../Models/profileModel");
 exports.search_dish = async (req, res) => {
   const query = req.query;
   const { name } = query;
-  const _dishes = await Dish.find({name});
+  const _dishes = await Dish.find({name:{ $regex: new RegExp("^" + name.toLowerCase(), "i") }});
   const dishes = _dishes.map(dish => {
     const d = Object.assign({}, {
       ...dish.toJSON(),
