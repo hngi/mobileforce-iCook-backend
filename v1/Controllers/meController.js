@@ -110,3 +110,7 @@ exports.unlink_facebook = async (req, res) => {
 exports.deleteAccount = async (req, res) => {
 
 };
+
+exports.uploadPhoto = async (req, res) => {
+
+};
