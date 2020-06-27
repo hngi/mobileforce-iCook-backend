@@ -14,6 +14,9 @@ router.get('/', passportJWT, user_controller.get_all_users);
 //get user by id
 router.get('/:id', passportJWT, user_controller.get_user_by_id);
 
+//put update user details
+router.put('/', passportJWT, user_controller.updateUserDetails);
+
 //update user favourite
 
 // router.patch('/:id/favourites', user_controller.update_user_favourites);

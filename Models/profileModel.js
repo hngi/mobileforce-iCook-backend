@@ -3,10 +3,12 @@ const schema = mongoose.Schema;
 const { ObjectId } = mongoose.Schema.Types;
 
 const profileSchema = new schema({
-  userId: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user'
-  }],
+  userId: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',
+    },
+  ],
   name: {
     type: String,
     trim: true,
@@ -43,18 +45,7 @@ const profileSchema = new schema({
       ref: 'dish',
     },
   ], //array of dish IDs
-  followers: [
-    {
-      name: String,
-      id: mongoose.Schema.Types.ObjectId,
-    },
-  ], //array of dishes posted by this user
-  favourites: [
-    {
-      name: String,
-      id: mongoose.Schema.Types.ObjectId,
-    },
-  ], //array of dish IDs
+
   followers: [{ type: ObjectId, ref: 'Profile' }],
   following: [{ type: ObjectId, ref: 'Profile' }],
 });

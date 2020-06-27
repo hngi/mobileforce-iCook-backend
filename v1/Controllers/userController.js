@@ -1,8 +1,7 @@
 const User = require('../../Models/authModel');
 const Dish = require('../../Models/dishModel');
 const uploadImage = require('../../Database/uploadImage');
-const Profile = require("../../Models/profileModel");
-
+const Profile = require('../../Models/profileModel');
 
 exports.get_all_users = async (req, res, next) => {
   try {
@@ -26,18 +25,18 @@ exports.get_all_users = async (req, res, next) => {
 
 exports.get_user_by_id = async (req, res, next) => {
   try {
-    const userId = req.params.id; 
-    const user = await Profile.findOne({userId}).populate('dishes');
-    if(user){
+    const userId = req.params.id;
+    const user = await Profile.findOne({ userId }).populate('dishes');
+    if (user) {
       res.status(200).json({
         status: 'success',
         error: '',
         results: user.length,
         data: {
           user,
-        }
-      })
-    } else{
+        },
+      });
+    } else {
       throw new Error('Not found');
     }
   } catch (err) {
@@ -48,11 +47,38 @@ exports.get_user_by_id = async (req, res, next) => {
   }
 };
 
+// PUT /api/v1/users
+exports.updateUserDetails = async (req, res, next) => {
+  try {
+    const fieldsToUpdate = {
+      name: req.body.name,
+      email: req.body.email,
+      gender: req.body.gender,
+      phoneNumber: req.body.phone,
+    };
+
+    const user = await Profile.findOneAndUpdate({ userId: req.user._id }, fieldsToUpdate, {
+      new: true,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      data: user,
+      error: {},
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err,
+    });
+  }
+};
 
 // /api/users/id/followers/:id - get
 exports.get_followers = async (req, res, next) => {
+  const id = req.params.id;
+
   try {
-    const user = await User.findOne({ _id: req.params.id });
+    const user = await Profile.findById(id);
 
     if (!user) {
       throw new Error('Not found');
@@ -61,7 +87,7 @@ exports.get_followers = async (req, res, next) => {
     const followers = user.followers;
 
     res.status(200).json({
-      status: success,
+      status: 'success',
       count: followers.length,
       data: followers,
       error: '',
@@ -76,8 +102,9 @@ exports.get_followers = async (req, res, next) => {
 
 // /api/users/following/:id - get
 exports.get_following = async (req, res, next) => {
+  const id = req.params.id;
   try {
-    const user = await User.findOne({ _id: req.params.id });
+    const user = await Profile.findById(id);
 
     if (!user) {
       throw new Error('Not found');
@@ -86,7 +113,7 @@ exports.get_following = async (req, res, next) => {
     const following = user.following;
 
     res.status(200).json({
-      status: success,
+      status: 'success',
       count: following.length,
       data: following,
       error: '',
@@ -102,14 +129,16 @@ exports.get_following = async (req, res, next) => {
 // /api/users/follow/:id - put
 exports.followUser = async (req, res, next) => {
   try {
-    const followId = req.params.id;
+    const followId = req.params.id.toString();
     const id = req.user._id.toString();
+
     if (id === followId) {
       throw new Error('You cant follow your self');
     }
 
-    const user = await User.findById(id);
-    const following = user.following;
+    const userProfile = await Profile.findOne({ userId: id });
+    const profileId = userProfile._id;
+    const following = userProfile.following;
 
     const isMatch = following.some((fol) => fol == followId);
 
@@ -121,16 +150,16 @@ exports.followUser = async (req, res, next) => {
       });
     }
 
-    await User.findByIdAndUpdate(
+    await Profile.findByIdAndUpdate(
       followId,
       {
-        $push: { followers: id },
+        $push: { followers: profileId },
       },
       { new: true }
     );
 
-    await User.findByIdAndUpdate(
-      id,
+    await Profile.findByIdAndUpdate(
+      profileId,
       {
         $push: { following: followId },
       },
@@ -138,7 +167,7 @@ exports.followUser = async (req, res, next) => {
     );
 
     res.status(200).json({
-      status: success,
+      status: 'success',
       message: `You have successfully followed user with ID ${followId} `,
       error: '',
     });
@@ -150,15 +179,16 @@ exports.followUser = async (req, res, next) => {
 // /api/users/unfollow/:id - put
 exports.unfollowUser = async (req, res, next) => {
   try {
-    const unfollowId = req.params.id;
+    const unfollowId = req.params.id.toString();
     const id = req.user._id.toString();
-    
+
     if (id === unfollowId) {
       throw new Error('You cant unfollow your self');
     }
 
-    const user = await User.findById(id);
-    const following = user.following;
+    const userProfile = await Profile.findOne({ userId: id });
+    const profileId = userProfile._id;
+    const following = userProfile.following;
 
     const isMatch = following.find((fol) => fol == unfollowId);
 
@@ -170,15 +200,15 @@ exports.unfollowUser = async (req, res, next) => {
       });
     }
 
-    await User.findByIdAndUpdate(
+    await Profile.findByIdAndUpdate(
       unfollowId,
       {
-        $pull: { followers: id },
+        $pull: { followers: profileId },
       },
       { new: true }
     );
-    await User.findByIdAndUpdate(
-      id,
+    await Profile.findByIdAndUpdate(
+      profileId,
       {
         $pull: { following: unfollowId },
       },
