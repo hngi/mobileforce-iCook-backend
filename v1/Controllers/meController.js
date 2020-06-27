@@ -3,6 +3,7 @@ const User = require('../../Models/authModel');
 const Dish = require('../../Models/dishModel');
 const uploadImage = require('../../Database/uploadImage');
 const Profile = require("../../Models/profileModel");
+const PublicResponse = require('../../Helpers/model');
 
 exports.get_me = async (req, res) => {
   try {
@@ -68,7 +69,7 @@ exports.get_favourites = async (req, res) => {
         error: '',
         data: {
           count: favourites.length,
-          favourites
+          dishes: PublicResponse.dishes(favourites, req) 
         }
       });
     } else{

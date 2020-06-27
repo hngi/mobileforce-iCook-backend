@@ -36,6 +36,6 @@ function _user(user, req) {
 
 // @Usman Jun 27
 exports.users = (_users, req) => _users.map(u => _user(u, req));
-exports.dishes = (_dishes, req, fn=() => undefined) => _dishes.map(d => _dish(d, req, fn(d._id.toString())));
+exports.dishes = (_dishes, req, fn=() => ({})) => _dishes.map(d => _dish(d, req, fn(d._id.toString())));
 exports.dish = _dish;
 exports.user = _user;
