@@ -1,21 +1,13 @@
 const User = require('../../Models/authModel');
 const Dish = require('../../Models/dishModel');
 const Profile = require("../../Models/profileModel");
+const PublicResponse = require('../../Helpers/model');
 
 exports.search_dish = async (req, res) => {
   const query = req.query;
   const { name } = query;
   const _dishes = await Dish.find({name:{ $regex: new RegExp("^" + name.toLowerCase(), "i") }});
-  const dishes = _dishes.map(dish => {
-    const d = Object.assign({}, {
-      ...dish.toJSON(),
-      likesCount: dish.likes.length,
-      isLiked : dish._isLiked(req.user._id)
-    });
-    delete d.likes;
-    delete d.comments;
-    return d;
-  });
+  const dishes = PublicResponse.dishes(_dishes, req);
   res.status(200)
     .json({ 
       status: "success",
