@@ -27,7 +27,7 @@ exports.get_all_users = async (req, res, next) => {
 exports.get_user_by_id = async (req, res, next) => {
   try {
     const userId = req.params.id; 
-    const user = await Profile.findOne({userId}).populate('dishes');
+    const user = await Profile.findOne({userId}).select(['-email', '-favDishes', '-favourites']).populate('dishes');
     const _user = Object.assign({}, {
       ...user.toJSON(),
       followersCount: user.followers ? user.followers.length : 0,
@@ -38,8 +38,6 @@ exports.get_user_by_id = async (req, res, next) => {
     });
     delete _user.followers;
     delete _user.following;
-    delete _user.favourites;
-    delete _user.favDishes;
 
     if(user){
       res.status(200).json({
