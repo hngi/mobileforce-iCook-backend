@@ -98,3 +98,15 @@ exports.update_profile = async (req, res) => {
 exports.update_settings = async (req, res) => {
 
 };
+
+exports.unlink_google = async (req, res) => {
+
+};
+
+exports.unlink_facebook = async (req, res) => {
+
+};
+
+exports.deleteAccount = async (req, res) => {
+
+};
