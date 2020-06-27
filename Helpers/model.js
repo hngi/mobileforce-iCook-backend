@@ -12,10 +12,7 @@ function _dish(dish, req) {
   delete d.comments;
   return d;
 };
-exports.dish = _dish;
 
-// @Usman Jun 27
-exports.dishes = (_dishes, req) => _dishes.map(d => _dish(d, req));
 
 // @Usman Jun 27
 function _user(user, req) {
@@ -36,7 +33,9 @@ function _user(user, req) {
   delete _user.favourites;
   return _user;
 };
-exports.user = _user;
 
 // @Usman Jun 27
 exports.users = (_users, req) => _users.map(u => _user(u, req));
+exports.dishes = (_dishes, req) => _dishes.map(d => _dish(d, req));
+exports.dish = _dish;
+exports.user = _user;
