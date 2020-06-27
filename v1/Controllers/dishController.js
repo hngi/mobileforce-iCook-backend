@@ -31,7 +31,7 @@ exports.createDish = async(req, res, next) => {
 
     await Profile.findByIdAndUpdate(profileId, {$push: { dishes: dish}}, {new: true, useFindAndModify: false });
     await dish.save();
-    return res.status(200).json({
+    return res.status(201).json({
       status: "success",
       error: "",
       message: "dish saved successfully!",
@@ -50,7 +50,6 @@ exports.createDish = async(req, res, next) => {
 }
 
 exports.get_all_dishes = async (req, res, next) => {
-  
   try {
     const dishes = await Dish.find({chefId: req.user._id});
     return res.status(200).json({
@@ -63,7 +62,7 @@ exports.get_all_dishes = async (req, res, next) => {
     })
   } 
   catch (error) {
-    return res.status(400).json({
+    return res.status(404).json({
       status: "fail",
       error: error.message
     })
@@ -72,7 +71,7 @@ exports.get_all_dishes = async (req, res, next) => {
 
 exports.get_dishes_by_ID = async (req, res, next) => {
   try{
-    const dish = await Dish.findById({_id: req.params.id});
+    const dish = await Dish.findById(req.params.id);
     if(dish){
       res.status(200).json({
         status: "success",
@@ -80,20 +79,31 @@ exports.get_dishes_by_ID = async (req, res, next) => {
         data: {
           dish
         }
-      })
+      });
     } else {
-      return res.status(400).json({
+      throw new Error('Not found');
+    }
+  } catch(error){
+      return res.status(404).json({
         status: "fail",
         error: `dish with ID ${req.params.id} not found`
       })
-    }
-  }
-  catch(error){
-    return res.status(400).json({
-      status: "fail",
-      error: error.message
-    })
   }
 };
 
-exports.delete_dish = (req, res, next) => {};
+// Delete operation should be idempotent
+exports.delete_dish = async (req, res, next) => {
+  try {
+    const data = await Dish.deleteOne({id: req.params.id});
+    res.status(200).json({
+      status: "success",
+      error: "",
+      data
+    });
+  } catch(error) {
+    return res.status(400).json({
+      status: "fail",
+      error: error.message
+    });
+  }
+};
