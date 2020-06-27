@@ -1,8 +1,6 @@
-require('dotenv').config();
 const JWT = require('jsonwebtoken');
 const Profile = require('../../Models/profileModel');
 const User = require('../../Models/authModel');
-const mongoose = require('mongoose');
 
 signToken = (user) => {
   return JWT.sign(
@@ -22,62 +20,62 @@ module.exports = {
     try{
       const { email, password, name, gender, phone } = req.body;
 
-    // Check if there is a user with the same email
-    const foundUser = await User.findOne({ "local.email": email });
-    const existingUser = await User.findOne({"google.email": email});
-    const facebookUser = await User.findOne({"facebook.email": email});
-    if (foundUser || existingUser || facebookUser) { 
-      return res.status(403).json({ error: 'Email is already in use'});
-    } 
-    if (!name || !phone || !gender) {
-      return res.status(400).json({
-        status: "fail",
-        error: "name, phone and gender fields are required"
-      })
-    }
-
-    // Create a new user
-    const newUser = new User({ 
-      method: 'local',
-      local: {
-        email: email, 
-        password: password,
+      // Check if there is a user with the same email
+      const foundUser = await User.findOne({ "local.email": email });
+      const existingUser = await User.findOne({"google.email": email});
+      const facebookUser = await User.findOne({"facebook.email": email});
+      if (foundUser || existingUser || facebookUser) { 
+        return res.status(403).json({ error: 'Email is already in use'});
       }
-    });
-
-    const profile = new Profile({ 
-      userId: newUser._id,
-      email: email,
-      name: name,
-      phoneNumber: phone,
-      gender: gender  
-    });
-    
-    await profile.save();
-    await newUser.profile.push(profile);
-    await newUser.save();
-    // await profile.userId.push(newUser._id);
-    console.log(newUser._id);
-    
-
-    // Generate the token
-    const token = signToken(newUser);
-    // Respond with token
-    return res.status(200).json({
-      status: "success",
-      error: "",
-      message: "user successfully registered!", 
-      data: { 
-        token: token,
-        userID: newUser._id,
-        profileID: profile._id,
-        email: newUser.local.email, 
-        name: profile.name,
-        phone: newUser.local.phone
+      if (!(name && phone && gender && email && password)) {
+        return res.status(400).json({
+          status: "fail",
+          error: "name, email, password, phone and gender fields are required"
+        });
       }
-    });
-    }
-    catch(error){
+
+      // Create a new user
+      const newUser = new User({ 
+        method: 'local',
+        local: {
+          email: email, 
+          password: password,
+        }
+      });
+
+      const profile = new Profile({ 
+        userId: newUser._id,
+        email: email,
+        name: name,
+        phoneNumber: phone,
+        gender: gender  
+      });
+      
+      await profile.save();
+      await newUser.profile.push(profile);
+      await newUser.save();
+      // await profile.userId.push(newUser._id);
+
+      // Generate the token
+      const token = signToken(newUser);
+      // Respond with token
+      return res.status(201)
+      .header("x-auth-token", token)
+      .json({
+        status: "success",
+        error: "",
+        message: "user successfully registered!", 
+        data: { 
+          token: token,
+          userID: newUser._id,
+          profileID: profile._id,
+          email: newUser.local.email, 
+          name: profile.name,
+          phone: newUser.local.phone,
+          token
+        }
+      });
+    } catch(error){
       return res.status(400).json({status: "fail", error: error.message});
     }
   },  

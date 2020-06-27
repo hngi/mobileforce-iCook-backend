@@ -1,6 +1,5 @@
 const User = require('../../Models/authModel');
 const Dish = require('../../Models/dishModel');
-const mongoose = require('mongoose');
 const uploadImage = require('../../Database/uploadImage');
 const Profile = require("../../Models/profileModel");
 
@@ -18,7 +17,7 @@ exports.get_all_users = async (req, res, next) => {
       },
     });
   } catch (err) {
-    res.status(500).json({
+    res.status(404).json({
       status: 'fail',
       error: err.message,
     });
@@ -27,8 +26,8 @@ exports.get_all_users = async (req, res, next) => {
 
 exports.get_user_by_id = async (req, res, next) => {
   try {
-    const profileId = req.params.id; 
-    const user = await Profile.findById({_id: profileId}).populate('dishes');
+    const userId = req.params.id; 
+    const user = await Profile.findOne({userId}).populate('dishes');
     if(user){
       res.status(200).json({
         status: 'success',
@@ -39,15 +38,12 @@ exports.get_user_by_id = async (req, res, next) => {
         }
       })
     } else{
-      return res.status(400).json({
-        status: 'fail',
-        error: `user with ID ${req.params.id} not found`,
-      });
+      throw new Error('Not found');
     }
   } catch (err) {
-    res.status(500).json({
+    return res.status(404).json({
       status: 'fail',
-      error: err.message,
+      error: `user with ID ${req.params.id} not found`,
     });
   }
 };
@@ -59,10 +55,7 @@ exports.get_followers = async (req, res, next) => {
     const user = await User.findOne({ _id: req.params.id });
 
     if (!user) {
-      return res.status(404).json({
-        status: fail,
-        message: 'User not found',
-      });
+      throw new Error('Not found');
     }
 
     const followers = user.followers;
@@ -74,23 +67,20 @@ exports.get_followers = async (req, res, next) => {
       error: '',
     });
   } catch (err) {
-    return res.status(500).json({
-      status: fail,
-      error: err,
+    return res.status(404).json({
+      status: 'fail',
+      message: 'User not found',
     });
   }
 };
 
-// /api/users/id/following - get
+// /api/users/following/:id - get
 exports.get_following = async (req, res, next) => {
   try {
     const user = await User.findOne({ _id: req.params.id });
 
     if (!user) {
-      return res.status(404).json({
-        status: fail,
-        message: 'User not found',
-      });
+      throw new Error('Not found');
     }
 
     const following = user.following;
@@ -102,31 +92,35 @@ exports.get_following = async (req, res, next) => {
       error: '',
     });
   } catch (err) {
-    return res.status(500).json({
-      status: fail,
-      error: err,
+    return res.status(404).json({
+      status: 'fail',
+      message: 'User not found',
     });
   }
 };
 
-// /api/users/id/follow/ - put
+// /api/users/follow/:id - put
 exports.followUser = async (req, res, next) => {
-  const followId = req.body.followId.toString();
-  const id = req.user.profile.id.toString();
-
-  const user = await User.findById(id);
-  const following = user.following;
-
-  const isMatch = following.some((fol) => fol == followId);
-
-  if (isMatch) {
-    return res.status(400).json({
-      status: fail,
-      message: `You are already following user with ID ${followId}`,
-    });
-  }
-
   try {
+    const followId = req.params.id;
+    const id = req.user._id.toString();
+    if (id === followId) {
+      throw new Error('You cant follow your self');
+    }
+
+    const user = await User.findById(id);
+    const following = user.following;
+
+    const isMatch = following.some((fol) => fol == followId);
+
+    if (isMatch) {
+      // idempotent mutation
+      return res.status(200).json({
+        status: 'fail',
+        message: `You are already following user with ID ${followId}`,
+      });
+    }
+
     await User.findByIdAndUpdate(
       followId,
       {
@@ -149,29 +143,33 @@ exports.followUser = async (req, res, next) => {
       error: '',
     });
   } catch (err) {
-    console.log(err);
-    return res.status(400).json({ status: fail, error: err });
+    return res.status(400).json({ status: 'fail', error: err.message });
   }
 };
 
-// /api/users/id/unfollow - put
+// /api/users/unfollow/:id - put
 exports.unfollowUser = async (req, res, next) => {
-  const unfollowId = req.body.unfollowId.toString();
-  const id = req.user.profile.id.toString();
-
-  const user = await User.findById(id);
-  const following = user.following;
-
-  const isMatch = following.find((fol) => fol == unfollowId);
-
-  if (!isMatch) {
-    return res.status(400).json({
-      status: fail,
-      message: `You have already unfollowed user with ID ${unfollowId}`,
-    });
-  }
-
   try {
+    const unfollowId = req.params.id;
+    const id = req.user._id.toString();
+    
+    if (id === unfollowId) {
+      throw new Error('You cant unfollow your self');
+    }
+
+    const user = await User.findById(id);
+    const following = user.following;
+
+    const isMatch = following.find((fol) => fol == unfollowId);
+
+    if (!isMatch) {
+      // idempotent mutation
+      return res.status(200).json({
+        status: 'fail',
+        message: `You have already unfollowed user with ID ${unfollowId}`,
+      });
+    }
+
     await User.findByIdAndUpdate(
       unfollowId,
       {
@@ -193,6 +191,6 @@ exports.unfollowUser = async (req, res, next) => {
       error: '',
     });
   } catch (err) {
-    return res.status(400).json({ status: fail, error: err });
+    return res.status(400).json({ status: 'fail', error: err.message });
   }
 };
