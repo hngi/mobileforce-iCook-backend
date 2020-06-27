@@ -11,7 +11,6 @@ exports.createDish = async(req, res, next) => {
       recipe,
       healthBenefits,
       ingredients,
-      chefName
     } = req.body;
 
     const userId = req.user._id;
@@ -21,7 +20,6 @@ exports.createDish = async(req, res, next) => {
       recipe: recipe,
       healthBenefits: healthBenefits,
       ingredients: ingredients,
-      chefName: chefName,
       chefId: userId
     });
 
