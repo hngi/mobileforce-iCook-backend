@@ -16,9 +16,13 @@ app.use("/api/v1/dishes", require("./v1/Routes/dishRoute"))
 app.use("/api/v1/authenticate", require("./v1/Routes/authRoute"))
 
 app.use((err, req, res, next) => {
+  console.log(err);
   res.status(500).json({
     status: 'fail',
     error: 'Something went wrong',
+    data: {
+      message: err.message,
+    }
   });
 });
 

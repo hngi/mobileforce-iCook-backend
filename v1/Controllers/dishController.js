@@ -93,14 +93,23 @@ exports.get_dishes_by_ID = async (req, res, next) => {
 // Delete operation should be idempotent
 exports.delete_dish = async (req, res, next) => {
   try {
-    const data = await Dish.deleteOne({id: req.params.id});
+    const dish = await Dish.findOne({_id: req.params.id});
+    if (!dish) {
+      throw new Error('Not found');
+    }
+
+    if (dish.chefId.toString() !== req.user._id.toString()) {
+      throw new Error('Unauthorized');
+    }
+    const data = await Dish.deleteOne({_id: req.params.id});
     res.status(200).json({
       status: "success",
       error: "",
       data
     });
   } catch(error) {
-    return res.status(400).json({
+    const code = error.message === 'Unauthorized' ? 403 : 400;
+    return res.status(code).json({
       status: "fail",
       error: error.message
     });
