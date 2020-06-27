@@ -35,7 +35,6 @@ exports.get_user_by_id = async (req, res, next) => {
       res.status(200).json({
         status: 'success',
         error: '',
-        results: user.length,
         data: {
           user: _user,
         }
