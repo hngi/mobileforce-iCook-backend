@@ -17,7 +17,8 @@ const dishSchema = new schema({
     type: [String]
   },
   likes: { 
-    type: [String] // You'll be able to make intelligent query based on user IDs
+    type: [String], // You'll be able to make intelligent query based on user IDs
+    default: []
   },
   ingredients: {
     type: [String],
