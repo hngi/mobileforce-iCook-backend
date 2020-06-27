@@ -5,6 +5,6 @@ const search_controller = require('../Controllers/searchController');
 const passport = require('passport');
 const passportJWT = passport.authenticate('jwt', { session: false });
 
-router.get('/dish', passportJWT, search_controller.search_dish);
+router.get('/', passportJWT, search_controller.search);
 
 module.exports = router;
