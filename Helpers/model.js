@@ -9,6 +9,7 @@ exports.dish = (dish, req) => {
   });
   delete d.likes;
   delete d.comments;
+  return d;
 };
 
 exports.dishes = (_dishes, req) => {
