@@ -34,6 +34,10 @@ const dishSchema = new schema({
   }],
 });
 
+dishSchema.methods._isLiked = function(userId) {
+  return this.likes.includes(userId);
+};
+
 const Dish = mongoose.model("dish", dishSchema);
 
 module.exports = Dish;

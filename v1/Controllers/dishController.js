@@ -49,7 +49,13 @@ exports.createDish = async(req, res, next) => {
 
 exports.get_all_dishes = async (req, res, next) => {
   try {
-    const dishes = await Dish.find({chefId: req.user._id}).select('-likes');
+    const _dishes = await Dish.find({chefId: req.user._id});
+    const dishes = _dishes.map(dish => {
+      return Object.assign({}, {
+        ...dish.toJSON(),
+        isLiked : dish._isLiked(req.user._id)
+      });
+    });
     return res.status(200).json({
       status: "success",
       error: "",
@@ -69,13 +75,16 @@ exports.get_all_dishes = async (req, res, next) => {
 
 exports.get_dishes_by_ID = async (req, res, next) => {
   try{
-    const dish = await Dish.findById(req.params.id).select('-likes');
+    const dish = await Dish.findById(req.params.id);
     if(dish){
       res.status(200).json({
         status: "success",
         error: "",
         data: {
-          dish
+          dish: Object.assign({}, {
+            ...dish.toJSON(),
+            isLiked: dish._isLiked(req.user._id)
+          })
         }
       });
     } else {
