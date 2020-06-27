@@ -1,5 +1,6 @@
 // public response
 
+// @Usman Jun 27
 exports.dish = (dish, req) => {
   const d = Object.assign({}, {
     ...dish.toJSON(),
@@ -12,6 +13,7 @@ exports.dish = (dish, req) => {
   return d;
 };
 
+// @Usman Jun 27
 exports.dishes = (_dishes, req) => {
   const dishes = _dishes.map(dish => {
     const d = Object.assign({}, {
