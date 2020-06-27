@@ -30,8 +30,16 @@ exports.get_user_by_id = async (req, res, next) => {
     const user = await Profile.findOne({userId}).populate('dishes');
     const _user = Object.assign({}, {
       ...user.toJSON(),
+      followersCount: user.followers ? user.followers.length : 0,
+      followingCount: user.following ? user.following.length : 0,
+      dishesCount: user.dishes ? user.dishes.length : 0,
       isFollowing: user._isFollowing(userId)
     });
+    delete _user.followers;
+    delete _user.following;
+    delete _user.favourites;
+    delete _user.favDishes;
+
     if(user){
       res.status(200).json({
         status: 'success',
