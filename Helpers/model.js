@@ -18,7 +18,7 @@ exports.dish = _dish;
 exports.dishes = (_dishes, req) => _dishes.map(d => _dish(d, req));
 
 // @Usman Jun 27
-exports.user = (user, req) => {
+function _user(user, req) {
   const userId = req.params.id; 
   const _user = Object.assign({}, {
     ...user.toJSON(),
@@ -32,3 +32,7 @@ exports.user = (user, req) => {
   delete _user.following;
   return _user;
 };
+exports.user = _user;
+
+// @Usman Jun 27
+exports.users = (_users, req) => _users.map(u => _user(u, req));

@@ -14,7 +14,7 @@ exports.get_all_users = async (req, res, next) => {
       error: '',
       results: users.length,
       data: {
-        users,
+        users: PublicResponse.users(users, req),
       },
     });
   } catch (err) {
