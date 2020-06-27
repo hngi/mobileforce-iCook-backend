@@ -144,7 +144,10 @@ exports.toggle_like = async (req, res) => {
       status: "success",
       error: "",
       data: {
-        dish
+        dish: Object.assign({}, {
+          ...dish.toJSON(),
+          isLiked: dish._isLiked(userId)
+        })
       }
     });
   } catch(error) {
