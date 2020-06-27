@@ -74,7 +74,7 @@ exports.get_followers = async (req, res, next) => {
   }
 };
 
-// /api/users/id/following - get
+// /api/users/following/:id - get
 exports.get_following = async (req, res, next) => {
   try {
     const user = await User.findOne({ _id: req.params.id });
