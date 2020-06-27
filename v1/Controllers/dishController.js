@@ -14,28 +14,30 @@ exports.createDish = async(req, res, next) => {
       chefName
     } = req.body;
 
-    const userId = req.params.id;
-    
+    const userId = req.user._id;
 
     const dish = new Dish({
       name: name,
       recipe: recipe,
       healthBenefits: healthBenefits,
       ingredients: ingredients,
-      chefName: chefName
+      chefName: chefName,
+      chefId: userId
     });
 
     const findProfile = await User.findById(userId).populate('profile');
-    // console.log(findProfile.profile[0]._id);
 
     const profileId = findProfile.profile[0]._id
 
-    const profile = await Profile.findByIdAndUpdate(profileId, {$push: { dishes: dish}}, {new: true, useFindAndModify: false });
+    await Profile.findByIdAndUpdate(profileId, {$push: { dishes: dish}}, {new: true, useFindAndModify: false });
     await dish.save();
     return res.status(200).json({
       status: "success",
       error: "",
-      message: "dish saved successfully!"
+      message: "dish saved successfully!",
+      data: {
+        dish
+      }
     });
 
   }
@@ -50,7 +52,7 @@ exports.createDish = async(req, res, next) => {
 exports.get_all_dishes = async (req, res, next) => {
   
   try {
-    const dishes = await Dish.find();
+    const dishes = await Dish.find({chefId: req.user._id});
     return res.status(200).json({
       status: "success",
       error: "",

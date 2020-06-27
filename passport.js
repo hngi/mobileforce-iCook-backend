@@ -73,13 +73,11 @@ passport.use(
         });
 
         await newProfile.save();
-        done(null, newProfile);
-
         await newUser.profile.push(newProfile);
         await newUser.save();
-        done(null, newUser);
+        return done(null, newUser);
       } catch (error) {
-        done(error, false, error.message);
+        return done(error, false, error.message);
       }
     }
   )
@@ -113,9 +111,9 @@ passport.use(
         });
 
         await newUser.save();
-        done(null, newUser);
+        return done(null, newUser);
       } catch (error) {
-        done(error, false, error.message);
+        return done(error, false, error.message);
       }
     }
   )
