@@ -43,18 +43,6 @@ const profileSchema = new schema({
       ref: 'dish',
     },
   ], //array of dish IDs
-  followers: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Profile'
-    },
-  ], //array of dishes posted by this user
-  favourites: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'dish'
-    },
-  ], //array of dish IDs
   followers: [{ type: ObjectId, ref: 'Profile' }],
   following: [{ type: ObjectId, ref: 'Profile' }],
 });
