@@ -50,8 +50,6 @@ passport.use(
         console.log('accessToken', accessToken);
         console.log('refreshToken', refreshToken);
         const name = profile.name.givenName+ " "+profile.name.familyName
-        console.log(name);
-
         const existingUser = await User.findOne({ 'google.id': profile.id });
         if (existingUser) {
           return done(null, existingUser);

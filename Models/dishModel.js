@@ -17,7 +17,8 @@ const dishSchema = new schema({
     type: [String]
   },
   likes: { 
-    type: [String] // You'll be able to make intelligent query based on user IDs
+    type: [String], // You'll be able to make intelligent query based on user IDs
+    default: []
   },
   ingredients: {
     type: [String],
@@ -32,6 +33,10 @@ const dishSchema = new schema({
     comment: String,
   }],
 });
+
+dishSchema.methods._isLiked = function(userId) {
+  return this.likes.includes(userId);
+};
 
 const Dish = mongoose.model("dish", dishSchema);
 
