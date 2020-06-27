@@ -56,6 +56,7 @@ exports.get_all_dishes = async (req, res, next) => {
         isLiked : dish._isLiked(req.user._id)
       });
       delete d.likes;
+      delete d.comments;
       return d;
     });
     return res.status(200).json({
@@ -84,6 +85,7 @@ exports.get_dishes_by_ID = async (req, res, next) => {
         isLiked: dish._isLiked(req.user._id)
       });
       delete d.likes;
+      delete d.comments;
       res.status(200).json({
         status: "success",
         error: "",
