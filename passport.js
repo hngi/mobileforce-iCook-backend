@@ -110,7 +110,17 @@ passport.use(
           },
         });
 
+        const newProfile = new Profile({
+          userId: newUser._id,
+          email: profile.emails[0].value,
+          name: profile.displayName,
+          gender: "others"
+        });
+
+        await newProfile.save();
+        await newUser.profile.push(newProfile);
         await newUser.save();
+        console.log(newUser._id);
         return done(null, newUser);
       } catch (error) {
         return done(error, false, error.message);
