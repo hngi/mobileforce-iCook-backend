@@ -53,6 +53,7 @@ exports.get_all_dishes = async (req, res, next) => {
     const dishes = _dishes.map(dish => {
       const d = Object.assign({}, {
         ...dish.toJSON(),
+        likesCount: dish.likes.length,
         isLiked : dish._isLiked(req.user._id)
       });
       delete d.likes;
@@ -82,6 +83,7 @@ exports.get_dishes_by_ID = async (req, res, next) => {
     if(dish){
       const d = Object.assign({}, {
         ...dish.toJSON(),
+        likesCount: dish.likes.length,
         isLiked: dish._isLiked(req.user._id)
       });
       delete d.likes;
@@ -148,6 +150,7 @@ exports.toggle_like = async (req, res) => {
     await dish.save();
     const d = Object.assign({}, {
       ...dish.toJSON(),
+      likesCount: dish.likes.length,
       isLiked: dish._isLiked(userId)
     });
     delete d.likes;
