@@ -35,7 +35,7 @@ const profileSchema = new schema({
   favourites: [{ type: ObjectId, ref: 'dish' }],
   followers: [{ type: ObjectId, ref: 'Profile' }],
   following: [{ type: ObjectId, ref: 'Profile' }],
-});
+}, { timestamps: true });
 
 profileSchema.methods._isFollowing = function (userId) {
   return this.followers.includes(userId);
