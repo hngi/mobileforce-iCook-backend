@@ -11,13 +11,14 @@ const userSchema = new Schema({
   local: {
     email: {
       type: String,
+      required: [true, 'A user requires an email'],
+      unique: true,
+      trim: true,
       lowercase: true,
     },
     password: {
       type: String,
-    },
-    password: {
-      type: String,
+      select: false
     },
   },
   google: {

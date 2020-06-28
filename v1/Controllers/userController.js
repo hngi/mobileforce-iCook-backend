@@ -1,6 +1,5 @@
 const User = require('../../Models/authModel');
 const Dish = require('../../Models/dishModel');
-const mongoose = require('mongoose');
 const uploadImage = require('../../Database/uploadImage');
 const Profile = require("../../Models/profileModel");
 
