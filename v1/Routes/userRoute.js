@@ -15,7 +15,7 @@ router.get('/', passportJWT, user_controller.get_all_users);
 router.get('/:id', passportJWT, user_controller.get_user_by_id);
 
 //put update user details
-router.put('/', passportJWT, user_controller.updateUserDetails);
+router.patch('/', passportJWT, user_controller.updateUserDetails);
 
 // follow a user
 router.put('/follow/:id', passportJWT, user_controller.followUser);
