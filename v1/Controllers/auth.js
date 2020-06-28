@@ -177,7 +177,7 @@ module.exports = {
   )}/api/v1/users/resetPassword/${resetToken}`;
 
   const text = `We've received a request to reset your password. If you didn't make the request,
-just ignore this email.Otherwise, you can reset your password using the link below:\n ${resetURL}.`;
+just ignore this email.Otherwise, you can reset your password using the link below:\n ${resetURL}`;
 
   const subject = 'Your password reset token (valid for 10 min)';
   try {
@@ -223,11 +223,11 @@ if (!user) {
 
 // 3) Log the user in, send JWT
 user.local.password = req.body.password;
-user.local.PasswordResetToken = undefined;
+user.local.passwordResetToken = undefined;
 user.local.passwordResetExpires = undefined;
 await user.save();
 const token = signToken(user._id);
-console.log(token);
+
 res.status(200).json({
   status: 'successful',
   token
