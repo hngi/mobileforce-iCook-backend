@@ -107,7 +107,7 @@ exports.get_all_dishes = async (req, res, next) => {
         total: dishes.length,
         count: paginated.length,
         dishes: paginated,
-        nextToken: lastToken
+        after: lastToken
       }
     })
   } 
