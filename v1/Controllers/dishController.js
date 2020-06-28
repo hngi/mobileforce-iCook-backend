@@ -57,30 +57,23 @@ exports.get_all_dishes = async (req, res, next) => {
     const {lastSync, size=15, after} = req.query;
     const date = lastSync ? new Date(req.query.lastSync) : new Date().setDate(new Date().getDate() - 3);
     const _dishes = await Dish.find({
-      $or: [
-        {
-          'chefId': {
-            $in: me.following.map(id => mongoose.Types.ObjectId(id.toString())),
-          }
-        },
-        {
-          'chefId': req.user._id
-        }
-      ],
       $and: [
         {
           $or: [
             {
-              'createdAt': {
-                $gte: date 
+              'chefId': {
+                $in: me.following.map(id => mongoose.Types.ObjectId(id.toString())),
               }
             },
             {
-              'updatedAt': {
-                $gte: date 
-              }
+              'chefId': req.user._id
             }
-          ]
+          ],
+        },
+        {
+          'updatedAt': {
+            $gte: date 
+          }
         }
       ]
     });
