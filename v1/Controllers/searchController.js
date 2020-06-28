@@ -17,7 +17,7 @@ exports.search = async (req, res) => {
     };
     case 'person': {
       const _users = await Profile.find({name:{ $regex: new RegExp("^" + name.toLowerCase(), "i") }});
-      total = _dishes.length;
+      total = _users.length;
       result = PublicResponse.users(_users, req);
       break;
     }
