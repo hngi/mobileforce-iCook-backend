@@ -4,7 +4,7 @@ const PublicResponse = require('../../Helpers/model');
 
 exports.search = async (req, res) => {
   const query = req.query;
-  const { type, name, limit=20, after=0 } = query;
+  const { type='dish', name='', limit=20, after=0 } = query;
   let result = [];
   let total;
   switch(type.toLowerCase()) {
