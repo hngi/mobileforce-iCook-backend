@@ -4,7 +4,6 @@ const Profile = require("../../Models/profileModel");
 const User = require('../../Models/authModel');
 const PublicResponse = require('../../Helpers/model');
 
-
 exports.createDish = async(req, res, next) => {
   try{
     const{
@@ -53,7 +52,8 @@ exports.get_all_dishes = async (req, res, next) => {
     const me = await Profile.findOne({
       userId: req.user._id
     });
-    const lastSync = req.query.lastSync ? new Date(req.query.lastSync) : new Date().setDate(new Date().getDate() - 3);
+    const {lastSync, size=15, after} = req.query;
+    const date = lastSync ? new Date(req.query.lastSync) : new Date().setDate(new Date().getDate() - 3);
     const _dishes = await Dish.find({
       $or: [
         {
@@ -70,12 +70,12 @@ exports.get_all_dishes = async (req, res, next) => {
           $or: [
             {
               'createdAt': {
-                $gte: lastSync
+                $gte: date 
               }
             },
             {
               'updatedAt': {
-                $gte: lastSync
+                $gte: date 
               }
             }
           ]
@@ -84,12 +84,30 @@ exports.get_all_dishes = async (req, res, next) => {
     });
     const isFavourite = id => ({ isFavourite: me.favourites.includes(id) });
     const dishes = PublicResponse.dishes(_dishes, req, isFavourite); 
+    let foundIndex = 0;
+    let paginated = [];
+
+    if (after) {
+      foundIndex = dishes.findIndex(d => d._id.toLocaleString() === after.toLocaleString());
+      if (foundIndex >= 0) {
+        const start = foundIndex + 1;
+        paginated = dishes.slice(start, start + Number(size));
+      }
+    } else {
+      paginated = dishes.slice(foundIndex, Number(size));
+    }
+
+    const last = paginated[paginated.length - 1];
+    const lastToken = last ? last._id : null;
+
     return res.status(200).json({
       status: "success",
       error: "",
-      results: dishes.length,
       data: {
-        dishes
+        total: dishes.length,
+        count: paginated.length,
+        dishes: paginated,
+        nextToken: lastToken
       }
     })
   } 
