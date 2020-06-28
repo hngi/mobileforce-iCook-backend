@@ -57,22 +57,40 @@ exports.get_auth = async (req, res) => {
 
 // @Usman Jun 27
 exports.get_favourites = async (req, res) => {
+  const {size=15, after} = req.query;
   try {
     const userId = req.user._id.toString(); 
     const me = await Profile.findOne({userId});
-    const favourites = await Dish.find({
+    let favourites = await Dish.find({
       '_id': {
         $in: me.favourites.map(id => mongoose.Types.ObjectId(id.toString()))
       }
     });
+    favourites = PublicResponse.dishes(favourites, req);
+    let paginated = [];
+    let foundIndex = 0;
+    if (after) {
+      foundIndex = favourites.findIndex(d => d._id.toLocaleString() === after.toLocaleString());
+      if (foundIndex >= 0) {
+        const start = foundIndex + 1;
+        paginated = favourites.slice(start, start + Number(size));
+      }
+    } else {
+      paginated = favourites.slice(foundIndex, Number(size));
+    }
+
+    const last = paginated[paginated.length - 1];
+    const lastToken = last ? last._id : null;
 
     if(me){
       res.status(200).json({
         status: 'success',
         error: '',
         data: {
-          count: favourites.length,
-          dishes: PublicResponse.dishes(favourites, req) 
+          total: favourites.length,
+          count: paginated.length,
+          dishes: paginated,
+          nextToken: lastToken
         }
       });
     } else{
