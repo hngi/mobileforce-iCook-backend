@@ -2,6 +2,7 @@ const Dish = require('../../Models/dishModel');
 const Profile = require("../../Models/profileModel");
 const PublicResponse = require('../../Helpers/model');
 
+// @Usman Jun 28
 exports.search = async (req, res) => {
   const query = req.query;
   const { type='dish', name='', limit=20, after=0 } = query;
@@ -16,7 +17,7 @@ exports.search = async (req, res) => {
     };
     case 'person': {
       const _users = await Profile.find({name:{ $regex: new RegExp("^" + name.toLowerCase(), "i") }});
-      total = _dishes.length;
+      total = _users.length;
       result = PublicResponse.users(_users, req);
       break;
     }

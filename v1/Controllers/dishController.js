@@ -57,30 +57,23 @@ exports.get_all_dishes = async (req, res, next) => {
     const {lastSync, size=15, after} = req.query;
     const date = lastSync ? new Date(req.query.lastSync) : new Date().setDate(new Date().getDate() - 3);
     const _dishes = await Dish.find({
-      $or: [
-        {
-          'chefId': {
-            $in: me.following.map(id => mongoose.Types.ObjectId(id.toString())),
-          }
-        },
-        {
-          'chefId': req.user._id
-        }
-      ],
       $and: [
         {
           $or: [
             {
-              'createdAt': {
-                $gte: date 
+              'chefId': {
+                $in: me.following.map(id => mongoose.Types.ObjectId(id.toString())),
               }
             },
             {
-              'updatedAt': {
-                $gte: date 
-              }
+              'chefId': req.user._id
             }
-          ]
+          ],
+        },
+        {
+          'updatedAt': {
+            $gte: date 
+          }
         }
       ]
     });
@@ -193,7 +186,7 @@ exports.edit_dish = async (req, res, next) => {
 }
 
 // Delete operation should be idempotent
-// @Usman Jun 27
+// @Usman Jun 28
 exports.delete_dish = async (req, res, next) => {
   try {
     const dish = await Dish.findOne({ _id: req.params.id })
@@ -204,11 +197,11 @@ exports.delete_dish = async (req, res, next) => {
     if (dish.chefId.toString() !== req.user._id.toString()) {
       throw new Error('Unauthorized')
     }
-    const data = await Dish.deleteOne({ _id: req.params.id })
+    const data = await Dish.findOneAndDelete({ _id: req.params.id })
     res.status(200).json({
       status: 'success',
       error: '',
-      data
+      data: {}
     })
   } catch (error) {
     const code = error.message === 'Unauthorized' ? 403 : 400
@@ -219,7 +212,7 @@ exports.delete_dish = async (req, res, next) => {
   }
 }
 
-// @Usman - Jun 27 12:02
+// @Usman - Jun 28
 exports.toggle_like = async (req, res) => {
   try {
     const dish = await Dish.findOne({ _id: req.params.id })
@@ -251,7 +244,7 @@ exports.toggle_like = async (req, res) => {
   }
 }
 
-// @Usman Jun 27
+// @Usman Jun 28
 exports.toggle_favorite = async (req, res) => {
   try {
     const dishId = req.params.id
