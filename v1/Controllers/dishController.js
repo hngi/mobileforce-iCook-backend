@@ -244,7 +244,7 @@ exports.toggle_like = async (req, res) => {
   }
 }
 
-// @Usman Jun 27
+// @Usman Jun 28
 exports.toggle_favorite = async (req, res) => {
   try {
     const dishId = req.params.id
