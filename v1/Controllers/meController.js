@@ -11,7 +11,6 @@ exports.get_me = async (req, res) => {
     const userId = req.user._id.toString()
     const me = await Profile.findOne({ userId }).select([
       '-favourites',
-      '-dishes',
       '-followers',
       '-following'
     ])

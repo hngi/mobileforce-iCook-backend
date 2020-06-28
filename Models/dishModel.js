@@ -38,6 +38,17 @@ dishSchema.methods._isLiked = function(userId) {
   return this.likes.includes(userId);
 };
 
+dishSchema.post('findOneAndDelete', async function (document) {
+  const Profile = mongoose.model('profile');
+  const userId = document.chefId;
+  const dishId = document._id;
+  await Profile.findOneAndUpdate({ userId }, {
+    $pull: {
+      dishes: dishId 
+    }
+  }, {new: true});
+});
+
 const Dish = mongoose.model("dish", dishSchema);
 
 module.exports = Dish;

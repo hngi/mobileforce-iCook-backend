@@ -197,11 +197,11 @@ exports.delete_dish = async (req, res, next) => {
     if (dish.chefId.toString() !== req.user._id.toString()) {
       throw new Error('Unauthorized')
     }
-    const data = await Dish.deleteOne({ _id: req.params.id })
+    const data = await Dish.findOneAndDelete({ _id: req.params.id })
     res.status(200).json({
       status: 'success',
       error: '',
-      data
+      data: {}
     })
   } catch (error) {
     const code = error.message === 'Unauthorized' ? 403 : 400
