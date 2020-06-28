@@ -1,9 +1,8 @@
 const User = require('../../Models/authModel');
 const Dish = require('../../Models/dishModel');
 const uploadImage = require('../../Database/uploadImage');
-const Profile = require("../../Models/profileModel");
+const Profile = require('../../Models/profileModel');
 const PublicResponse = require('../../Helpers/model');
-
 
 exports.get_all_users = async (req, res, next) => {
   try {
@@ -27,19 +26,21 @@ exports.get_all_users = async (req, res, next) => {
 
 exports.get_user_by_id = async (req, res, next) => {
   try {
-    const userId = req.params.id; 
-    const user = await Profile.findOne({userId}).select(['-email', '-favourites']).populate('dishes');
+    const userId = req.params.id;
+    const user = await Profile.findOne({ userId })
+      .select(['-email', '-favourites'])
+      .populate('dishes');
     const _user = PublicResponse.user(user, req);
 
-    if(user){
+    if (user) {
       res.status(200).json({
         status: 'success',
         error: '',
         data: {
           user: _user,
-        }
-      })
-    } else{
+        },
+      });
+    } else {
       throw new Error('Not found');
     }
   } catch (err) {
@@ -50,6 +51,31 @@ exports.get_user_by_id = async (req, res, next) => {
   }
 };
 
+// PUT /api/v1/users
+exports.updateUserDetails = async (req, res, next) => {
+  try {
+    const fieldsToUpdate = {
+      name: req.body.name,
+      email: req.body.email,
+      gender: req.body.gender,
+      phoneNumber: req.body.phone,
+    };
+
+    const user = await Profile.findOneAndUpdate({ userId: req.user._id }, fieldsToUpdate, {
+      new: true,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      data: user,
+      error: {},
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err,
+    });
+  }
+};
 
 // /api/users/id/followers/:id - get
 exports.get_followers = async (req, res, next) => {
@@ -154,7 +180,7 @@ exports.unfollowUser = async (req, res, next) => {
   try {
     const unfollowId = req.params.id;
     const id = req.user._id.toString();
-    
+
     if (id === unfollowId) {
       throw new Error('You cant unfollow your self');
     }
