@@ -186,7 +186,7 @@ exports.edit_dish = async (req, res, next) => {
 }
 
 // Delete operation should be idempotent
-// @Usman Jun 27
+// @Usman Jun 28
 exports.delete_dish = async (req, res, next) => {
   try {
     const dish = await Dish.findOne({ _id: req.params.id })
