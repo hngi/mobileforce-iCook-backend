@@ -5,7 +5,7 @@ const uploadImage = require('../../Database/uploadImage')
 const Profile = require('../../Models/profileModel')
 const PublicResponse = require('../../Helpers/model')
 
-// @Usman Jun 27
+// @Usman Jun 28
 exports.get_me = async (req, res) => {
   try {
     const userId = req.user._id.toString()
