@@ -219,37 +219,36 @@ just ignore this email.Otherwise, you can reset your password using the link bel
   },
 
   resetPassword: async (req, res, next) => {
-    // 1) Get user based on the token
-  const hashedToken = crypto
-  .createHash('sha256')
-  .update(req.params.token)
-  .digest('hex');
+      // 1) Get user based on the token
+    const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
 
-const user = await User.findOne({
-  "local.passwordResetToken": hashedToken,
-  "local.passwordResetExpires": { $gt: Date.now() }
-});
+    const user = await User.findOne({
+    "local.passwordResetToken": hashedToken,
+    "local.passwordResetExpires": { $gt: Date.now() }
+    });
 
-// 2) If token has not expired, and there is user, set the new password
-if (!user) {
-  return res.status(400).json({
-    status: "fail",
-    message: 'Token is invalid or has expired'
-  })
-}
+    // 2) If token has not expired, and there is user, set the new password
+    if (!user) {
+    return res.status(400).json({
+      status: "fail",
+      message: 'Token is invalid or has expired'
+    })
+    }
 
 
-// 3) Log the user in, send JWT
-user.local.password = req.body.password;
-user.local.passwordResetToken = undefined;
-user.local.passwordResetExpires = undefined;
-await user.save();
-const token = signToken(user._id);
+    // 3) Log the user in, send JWT
+    user.local.password = req.body.password;
+    user.local.passwordResetToken = undefined;
+    user.local.passwordResetExpires = undefined;
+    await user.save();
+    const token = signToken(user._id);
 
-res.status(200).json({
-  status: 'successful',
-  token
-});
+    res.status(200).json({
+    status: 'successful',
+    token
+    });
   }
 }
-};
