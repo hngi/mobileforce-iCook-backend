@@ -32,7 +32,7 @@ const dishSchema = new schema({
     chefName: String,
     comment: String,
   }],
-});
+}, { timestamps: true });
 
 dishSchema.methods._isLiked = function(userId) {
   return this.likes.includes(userId);

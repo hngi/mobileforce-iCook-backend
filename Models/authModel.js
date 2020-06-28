@@ -44,11 +44,10 @@ const userSchema = new Schema({
       ref: 'profile',
     },
   ],
-});
+}, {timestamps:true});
 
 userSchema.pre('save', async function (next) {
   try {
-    console.log('entered');
     if (this.method !== 'local') {
       next();
     }
@@ -59,7 +58,6 @@ userSchema.pre('save', async function (next) {
     const passwordHash = await bcrypt.hash(this.local.password, salt);
     // Re-assign hashed version over original, plain text password
     this.local.password = passwordHash;
-    console.log('exited');
     next();
   } catch (error) {
     next(error);
