@@ -50,9 +50,37 @@ exports.createDish = async(req, res, next) => {
 
 exports.get_all_dishes = async (req, res, next) => {
   try {
-    const _dishes = await Dish.find({chefId: req.user._id});
     const me = await Profile.findOne({
       userId: req.user._id
+    });
+    const lastSync = req.query.lastSync ? new Date(req.query.lastSync) : new Date().setDate(new Date().getDate() - 3);
+    const _dishes = await Dish.find({
+      $or: [
+        {
+          'chefId': {
+            $in: me.following.map(id => mongoose.Types.ObjectId(id.toString())),
+          }
+        },
+        {
+          'chefId': req.user._id
+        }
+      ],
+      $and: [
+        {
+          $or: [
+            {
+              'createdAt': {
+                $gte: lastSync
+              }
+            },
+            {
+              'updatedAt': {
+                $gte: lastSync
+              }
+            }
+          ]
+        }
+      ]
     });
     const isFavourite = id => ({ isFavourite: me.favourites.includes(id) });
     const dishes = PublicResponse.dishes(_dishes, req, isFavourite); 
