@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
@@ -11,14 +12,16 @@ const userSchema = new Schema({
   local: {
     email: {
       type: String,
+      required: [true, 'A user requires an email'],
+      unique: true,
+      trim: true,
       lowercase: true,
     },
     password: {
       type: String,
     },
-    password: {
-      type: String,
-    },
+    passwordResetToken: String,
+    passwordResetExpires: Date
   },
   google: {
     id: {
@@ -70,6 +73,20 @@ userSchema.methods.isValidPassword = async function (newPassword, res) {
   } catch (error) {
     throw new Error(error);
   }
+};
+
+userSchema.methods.createPasswordResetToken = function() {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.local.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  //console.log({ resetToken }, this.local.passwordResetToken);
+  this.local.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 // Create a model
