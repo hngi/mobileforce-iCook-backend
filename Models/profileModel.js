@@ -31,33 +31,15 @@ const profileSchema = new schema({
   bio: {
     type: String,
   },
-  dishes: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'dish',
-    },
-  ], //array of dishes posted by this user
-  favDishes: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'dish',
-    },
-  ], //array of dish IDs
-  followers: [
-    {
-      name: String,
-      id: mongoose.Schema.Types.ObjectId,
-    },
-  ], //array of dishes posted by this user
-  favourites: [
-    {
-      name: String,
-      id: mongoose.Schema.Types.ObjectId,
-    },
-  ], //array of dish IDs
+  dishes: [{ type: ObjectId, ref: 'dish' }],
+  favourites: [{ type: ObjectId, ref: 'dish' }],
   followers: [{ type: ObjectId, ref: 'Profile' }],
   following: [{ type: ObjectId, ref: 'Profile' }],
 });
+
+profileSchema.methods._isFollowing = function (userId) {
+  return this.followers.includes(userId);
+}
 
 const Profile = mongoose.model('profile', profileSchema);
 

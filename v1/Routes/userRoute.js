@@ -14,13 +14,6 @@ router.get('/', passportJWT, user_controller.get_all_users);
 //get user by id
 router.get('/:id', passportJWT, user_controller.get_user_by_id);
 
-//update user favourite
-
-// router.patch('/:id/favourites', user_controller.update_user_favourites);
-
-//update user's list of dishes (add a dish)
-//api/v1/users/:id/dishes
-
 // follow a user
 router.put('/follow/:id', passportJWT, user_controller.followUser);
 

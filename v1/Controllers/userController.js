@@ -2,18 +2,19 @@ const User = require('../../Models/authModel');
 const Dish = require('../../Models/dishModel');
 const uploadImage = require('../../Database/uploadImage');
 const Profile = require("../../Models/profileModel");
+const PublicResponse = require('../../Helpers/model');
 
 
 exports.get_all_users = async (req, res, next) => {
   try {
     // const users = await User.find().populate('profile').select('_id method local.email');
-    const users = await Profile.find().populate('dishes');
+    const users = await Profile.find().select('-email').populate('dishes');
     res.status(200).json({
       status: 'success',
       error: '',
       results: users.length,
       data: {
-        users,
+        users: PublicResponse.users(users, req),
       },
     });
   } catch (err) {
@@ -27,14 +28,15 @@ exports.get_all_users = async (req, res, next) => {
 exports.get_user_by_id = async (req, res, next) => {
   try {
     const userId = req.params.id; 
-    const user = await Profile.findOne({userId}).populate('dishes');
+    const user = await Profile.findOne({userId}).select(['-email', '-favourites']).populate('dishes');
+    const _user = PublicResponse.user(user, req);
+
     if(user){
       res.status(200).json({
         status: 'success',
         error: '',
-        results: user.length,
         data: {
-          user,
+          user: _user,
         }
       })
     } else{
@@ -109,7 +111,7 @@ exports.followUser = async (req, res, next) => {
     }
 
     const user = await User.findById(id);
-    const following = user.following;
+    const following = user.following || [];
 
     const isMatch = following.some((fol) => fol == followId);
 
@@ -158,7 +160,7 @@ exports.unfollowUser = async (req, res, next) => {
     }
 
     const user = await User.findById(id);
-    const following = user.following;
+    const following = user.following || [];
 
     const isMatch = following.find((fol) => fol == unfollowId);
 
