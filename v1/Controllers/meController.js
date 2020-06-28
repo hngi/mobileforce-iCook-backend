@@ -64,15 +64,6 @@ exports.get_auth = async (req, res) => {
 exports.get_favourites = async (req, res) => {
   const {size=15, after} = req.query;
   try {
-<<<<<<< HEAD
-    const userId = req.user._id.toString()
-    const me = await Profile.findOne({ userId })
-    const favourites = await Dish.find({
-      _id: {
-        $in: me.favourites.map((id) => mongoose.Types.ObjectId(id.toString()))
-      }
-    })
-=======
     const userId = req.user._id.toString(); 
     const me = await Profile.findOne({userId});
     let favourites = await Dish.find({
@@ -95,22 +86,16 @@ exports.get_favourites = async (req, res) => {
 
     const last = paginated[paginated.length - 1];
     const lastToken = last ? last._id : null;
->>>>>>> paginate response
 
     if (me) {
       res.status(200).json({
         status: 'success',
         error: '',
         data: {
-<<<<<<< HEAD
-          count: favourites.length,
-          dishes: PublicResponse.dishes(favourites, req)
-=======
           total: favourites.length,
           count: paginated.length,
           dishes: paginated,
           nextToken: lastToken
->>>>>>> paginate response
         }
       })
     } else {
