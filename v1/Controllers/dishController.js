@@ -186,7 +186,7 @@ exports.edit_dish = async (req, res, next) => {
 }
 
 // Delete operation should be idempotent
-// @Usman Jun 27
+// @Usman Jun 28
 exports.delete_dish = async (req, res, next) => {
   try {
     const dish = await Dish.findOne({ _id: req.params.id })
@@ -212,7 +212,7 @@ exports.delete_dish = async (req, res, next) => {
   }
 }
 
-// @Usman - Jun 27 12:02
+// @Usman - Jun 28
 exports.toggle_like = async (req, res) => {
   try {
     const dish = await Dish.findOne({ _id: req.params.id })
@@ -244,7 +244,7 @@ exports.toggle_like = async (req, res) => {
   }
 }
 
-// @Usman Jun 27
+// @Usman Jun 28
 exports.toggle_favorite = async (req, res) => {
   try {
     const dishId = req.params.id
