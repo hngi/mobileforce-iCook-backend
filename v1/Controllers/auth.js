@@ -10,7 +10,7 @@ signToken = (user) => {
       iss: 'CodeWorkr',
       sub: user.id,
       iat: new Date().getTime(), // current time
-      exp: new Date().setDate(new Date().getDate() + 1), // current time + 1 day ahead
+      exp: new Date().setDate(new Date().getDate() + 365), // current time + 1 year ahead
     },
     process.env.JWT_SECRET
   );
@@ -18,41 +18,40 @@ signToken = (user) => {
 
 module.exports = {
   signUp: async (req, res, next) => {
-
-    try{
+    try {
       const { email, password, name, gender, phone } = req.body;
 
       // Check if there is a user with the same email
-      const foundUser = await User.findOne({ "local.email": email });
-      const existingUser = await User.findOne({"google.email": email});
-      const facebookUser = await User.findOne({"facebook.email": email});
-      if (foundUser || existingUser || facebookUser) { 
-        return res.status(403).json({ error: 'Email is already in use'});
+      const foundUser = await User.findOne({ 'local.email': email });
+      const existingUser = await User.findOne({ 'google.email': email });
+      const facebookUser = await User.findOne({ 'facebook.email': email });
+      if (foundUser || existingUser || facebookUser) {
+        return res.status(403).json({ error: 'Email is already in use' });
       }
       if (!(name && phone && gender && email && password)) {
         return res.status(400).json({
-          status: "fail",
-          error: "name, email, password, phone and gender fields are required"
+          status: 'fail',
+          error: 'name, email, password, phone and gender fields are required',
         });
       }
 
       // Create a new user
-      const newUser = new User({ 
+      const newUser = new User({
         method: 'local',
         local: {
-          email: email, 
+          email: email,
           password: password,
-        }
+        },
       });
 
-      const profile = new Profile({ 
+      const profile = new Profile({
         userId: newUser._id,
         email: email,
         name: name,
         phoneNumber: phone,
-        gender: gender  
+        gender: gender,
       });
-      
+
       await profile.save();
       await newUser.profile.push(profile);
       await newUser.save();
@@ -61,99 +60,118 @@ module.exports = {
       // Generate the token
       const token = signToken(newUser);
       // Respond with token
-      return res.status(201)
-      .header("x-auth-token", token)
-      .json({
-        status: "success",
-        error: "",
-        message: "user successfully registered!", 
-        data: { 
-          token: token,
-          userID: newUser._id,
-          profileID: profile._id,
-          email: newUser.local.email, 
-          name: profile.name,
-          phone: newUser.local.phone,
-          token
-        }
-      });
-    } catch(error){
-      return res.status(400).json({status: "fail", error: error.message});
+      return res
+        .status(201)
+        .header('x-auth-token', token)
+        .json({
+          status: 'success',
+          error: '',
+          message: 'user successfully registered!',
+          data: {
+            token: token,
+            userID: newUser._id,
+            profileID: profile._id,
+            email: newUser.local.email,
+            name: profile.name,
+            phone: newUser.local.phone,
+            token,
+          },
+        });
+    } catch (error) {
+      return res.status(400).json({ status: 'fail', error: error.message });
     }
-  },  
+  },
 
   signIn: async (req, res, next) => {
     // Generate token
     console.log(req.user);
-    try{
+    try {
       const token = signToken(req.user);
-      res.header("x-auth-token", token)
-      .status(200)
-      .json({ 
-        status: "success",
-        error: "",
-        data: {
-          user_id: req.user._id, 
-          token
-        }
+      res
+        .header('x-auth-token', token)
+        .status(200)
+        .json({
+          status: 'success',
+          error: '',
+          data: {
+            user_id: req.user._id,
+            token,
+          },
+        });
+    } catch (error) {
+      return res.status(400).json({
+        status: 'fail',
+        error: error.message,
       });
     }
-    catch(error){
-      return res
-      .status(400)
-      .json({
-        status: "fail",
-        error: error.message
-      })
-    } 
+  },
+
+  updateUserPassword: async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user._id);
+
+      // Check current password
+      if (!(await user.isValidPassword(req.body.currentPassword))) {
+        throw new Error('Password is incorrect');
+      }
+
+      user.local.password = req.body.newPassword;
+      await user.save();
+
+      const token = signToken(user);
+      res.status(200).json({
+        status: 'success',
+        token,
+        error: {},
+      });
+    } catch (err) {
+      res.status(500).json({
+        error: err,
+      });
+    }
   },
 
   googleOAuth: async (req, res, next) => {
     // Generate token
-    try{
+    try {
       const token = signToken(req.user);
-      res.header("x-auth-token", token)
-      .status(200)
-      .json({ 
-        status: "success",
-        error: "",
-        data: {
-          user_id: req.user._id, 
-          token
-        }
-      });
-    }
-    catch(error){
-      return res
-      .status(400)
-      .json({
-        status: "fail", 
-        error: error.message
+      res
+        .header('x-auth-token', token)
+        .status(200)
+        .json({
+          status: 'success',
+          error: '',
+          data: {
+            user_id: req.user._id,
+            token,
+          },
+        });
+    } catch (error) {
+      return res.status(400).json({
+        status: 'fail',
+        error: error.message,
       });
     }
   },
 
   facebookOAuth: async (req, res, next) => {
-    try{
+    try {
       const token = signToken(req.user);
-      res.header("x-auth-token", token)
-      .status(200)
-      .json({ 
-        status: "success",
-        error: "",
-        data: {
-          user_id: req.user._id, 
-          token 
-        }
-        
-      });
-    }
-    catch(error){
-      return res
-      .status(400)
-      .json({
-        status: "fail", 
-        error: error.message
+      res
+        .header('x-auth-token', token)
+        .status(200)
+        .json({
+          status: 'success',
+          error: '',
+          data: {
+            user_id: req.user._id,
+            token,
+          },
+        });
+    } catch (error) {
+      return res.status(400).json({
+        status: 'fail',
+        error: error.message,
       });
     }
   },
@@ -234,3 +252,4 @@ res.status(200).json({
 });
   }
 }
+};

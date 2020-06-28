@@ -47,7 +47,7 @@ const userSchema = new Schema({
       ref: 'profile',
     },
   ],
-});
+}, {timestamps:true});
 
 userSchema.pre('save', async function (next) {
   try {
