@@ -1,8 +1,8 @@
-const Dish = require('../../Models/dishModel')
-const uploadImage = require('../../Database/uploadImage')
-const Profile = require('../../Models/profileModel')
-const User = require('../../Models/authModel')
-const PublicResponse = require('../../Helpers/model')
+const Dish = require("../../Models/dishModel");
+const uploadImage = require("../../Database/uploadImage");
+const Profile = require("../../Models/profileModel");
+const User = require('../../Models/authModel');
+const PublicResponse = require('../../Helpers/model');
 
 exports.createDish = async(req, res, next) => {
   try{

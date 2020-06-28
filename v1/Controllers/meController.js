@@ -95,7 +95,7 @@ exports.get_favourites = async (req, res) => {
           total: favourites.length,
           count: paginated.length,
           dishes: paginated,
-          nextToken: lastToken
+          after: lastToken
         }
       })
     } else {
