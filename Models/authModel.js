@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
@@ -18,8 +19,9 @@ const userSchema = new Schema({
     },
     password: {
       type: String,
-      select: false
     },
+    passwordResetToken: String,
+    passwordResetExpires: Date
   },
   google: {
     id: {
@@ -59,7 +61,6 @@ userSchema.pre('save', async function (next) {
     const passwordHash = await bcrypt.hash(this.local.password, salt);
     // Re-assign hashed version over original, plain text password
     this.local.password = passwordHash;
-    console.log('exited');
     next();
   } catch (error) {
     next(error);
@@ -72,6 +73,20 @@ userSchema.methods.isValidPassword = async function (newPassword, res) {
   } catch (error) {
     throw new Error(error);
   }
+};
+
+userSchema.methods.createPasswordResetToken = function() {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.local.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  //console.log({ resetToken }, this.local.passwordResetToken);
+  this.local.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 // Create a model

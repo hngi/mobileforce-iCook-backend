@@ -2,6 +2,7 @@ const Dish = require("../../Models/dishModel");
 const uploadImage = require("../../Database/uploadImage");
 const Profile = require("../../Models/profileModel");
 const User = require('../../Models/authModel');
+const PublicResponse = require('../../Helpers/model');
 
 
 exports.createDish = async(req, res, next) => {
@@ -11,31 +12,31 @@ exports.createDish = async(req, res, next) => {
       recipe,
       healthBenefits,
       ingredients,
-      chefName
     } = req.body;
 
-    const userId = req.params.id;
-    
+    const userId = req.user._id;
 
     const dish = new Dish({
       name: name,
       recipe: recipe,
       healthBenefits: healthBenefits,
       ingredients: ingredients,
-      chefName: chefName
+      chefId: userId
     });
 
     const findProfile = await User.findById(userId).populate('profile');
-    // console.log(findProfile.profile[0]._id);
 
     const profileId = findProfile.profile[0]._id
 
-    const profile = await Profile.findByIdAndUpdate(profileId, {$push: { dishes: dish}}, {new: true, useFindAndModify: false });
+    await Profile.findByIdAndUpdate(profileId, {$push: { dishes: dish}}, {new: true, useFindAndModify: false });
     await dish.save();
-    return res.status(200).json({
+    return res.status(201).json({
       status: "success",
       error: "",
-      message: "dish saved successfully!"
+      message: "dish saved successfully!",
+      data: {
+        dish
+      }
     });
 
   }
@@ -48,9 +49,13 @@ exports.createDish = async(req, res, next) => {
 }
 
 exports.get_all_dishes = async (req, res, next) => {
-  
   try {
-    const dishes = await Dish.find();
+    const _dishes = await Dish.find({chefId: req.user._id});
+    const me = await Profile.findOne({
+      userId: req.user._id
+    });
+    const isFavourite = id => ({ isFavourite: me.favourites.includes(id) });
+    const dishes = PublicResponse.dishes(_dishes, req, isFavourite); 
     return res.status(200).json({
       status: "success",
       error: "",
@@ -61,7 +66,7 @@ exports.get_all_dishes = async (req, res, next) => {
     })
   } 
   catch (error) {
-    return res.status(400).json({
+    return res.status(404).json({
       status: "fail",
       error: error.message
     })
@@ -70,28 +75,121 @@ exports.get_all_dishes = async (req, res, next) => {
 
 exports.get_dishes_by_ID = async (req, res, next) => {
   try{
-    const dish = await Dish.findById({_id: req.params.id});
+    const dish = await Dish.findById(req.params.id);
     if(dish){
+      const me = await Profile.findOne({
+        userId: req.user._id
+      });
+      const isFavourite = me.favourites.includes(req.params.id);
+      const d = PublicResponse.dish(dish, req, { isFavourite }); 
       res.status(200).json({
         status: "success",
         error: "",
         data: {
-          dish
+          dish: d
         }
-      })
+      });
     } else {
-      return res.status(400).json({
+      throw new Error('Not found');
+    }
+  } catch(error){
+      return res.status(404).json({
         status: "fail",
         error: `dish with ID ${req.params.id} not found`
       })
-    }
-  }
-  catch(error){
-    return res.status(400).json({
-      status: "fail",
-      error: error.message
-    })
   }
 };
 
-exports.delete_dish = (req, res, next) => {};
+// Delete operation should be idempotent
+// @Usman Jun 27
+exports.delete_dish = async (req, res, next) => {
+  try {
+    const dish = await Dish.findOne({_id: req.params.id});
+    if (!dish) {
+      throw new Error('Not found');
+    }
+
+    if (dish.chefId.toString() !== req.user._id.toString()) {
+      throw new Error('Unauthorized');
+    }
+    const data = await Dish.deleteOne({_id: req.params.id});
+    res.status(200).json({
+      status: "success",
+      error: "",
+      data
+    });
+  } catch(error) {
+    const code = error.message === 'Unauthorized' ? 403 : 400;
+    return res.status(code).json({
+      status: "fail",
+      error: error.message
+    });
+  }
+};
+
+// @Usman - Jun 27 12:02
+exports.toggle_like = async (req, res) => {
+  try {
+    const dish = await Dish.findOne({_id: req.params.id});
+    if (!dish) {
+      throw new Error('Not found');
+    }
+    const userId = req.user._id.toString();
+    const isLiked = dish.likes.includes(userId);
+    if (isLiked) {
+      dish.likes = dish.likes.filter(id => userId !== id);
+    } else {
+      dish.likes.push(userId);
+    }
+    await dish.save();
+    const d = PublicResponse.dish(dish, req); 
+    res.status(200).json({
+      status: "success",
+      error: "",
+      data: {
+        dish: d 
+      }
+    });
+  } catch(error) {
+    const code = error.message === 'Not found' ? 404 : 400;
+    return res.status(code).json({
+      status: "fail",
+      error: error.message
+    });
+  }
+};
+
+// @Usman Jun 27
+exports.toggle_favorite = async (req, res) => {
+  try {
+    const dishId = req.params.id;
+    const dish = await Dish.findOne({_id: dishId});
+    if (!dish) {
+      throw new Error('Not found');
+    }
+    const me = await Profile.findOne({
+      userId: req.user._id
+    });
+    const isFavorite = me.favourites && me.favourites.includes(dishId);
+
+    if (isFavorite) {
+      me.favourites = me.favourites.filter(id => id.toString() !== dishId);
+    } else {
+      me.favourites.push(dishId);
+    };
+    me.save();
+
+    return res.status(200).json({
+      status: 'success',
+      error: '',
+      data: {
+        dish: PublicResponse.dish(dish, req, {isFavorite: !isFavorite})
+      }
+    });
+  } catch(error) {
+    return res.status(400).json({
+      status: 'fail',
+      error: error.message
+    });
+  }
+};

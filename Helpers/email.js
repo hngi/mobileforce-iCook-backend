@@ -1,16 +1,29 @@
-const Mailgun = require('mailgun-js');
+const nodemailer = require('nodemailer');
+const auth = require('../v1/Controllers/auth');
 
-const apiKey = process.env.MAILGUN_API_KEY;
-const domain = process.env.MAILGUN_DOMAIN;
-const mailgun = new Mailgun({ apiKey: apiKey, domain: domain });
+const email = process.env.EMAIL;
+const password = process.env.PASSWORD;
 
 exports.sendEmail = async (recipient, message) => {
   const data = {
-    from: 'iCook <info@mg.iCook.live>',
+    from: `iCook <${email}>`,
     to: recipient,
     subject: message.subject,
     text: message.text
   };
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: email ,
+        pass: password
+    }
+    });
 
-  await mailgun.messages().send(data);
+   // send email
+transporter.sendMail(data, (error, response) => {
+    if (error) {
+        console.log(error);
+    }
+});
+
 };
