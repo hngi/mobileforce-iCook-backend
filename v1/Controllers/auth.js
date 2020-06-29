@@ -252,5 +252,33 @@ just ignore this email.Otherwise, you can reset your password using the link bel
     status: 'successful',
     token
     });
+  },
+
+  unlink_google_account: async (req, res, next) => {
+    try{
+      
+      const user = await User.findById(req.user._id);
+      if (user){
+         user.method = 'local';
+         user.local.email = user.google.email;
+         user.local.password = req.body.setPassword;
+         user.google = undefined;
+
+         await user.save();
+        return res.status(200).json({
+          status: "success",
+          error: "",
+          data:{
+            message: "Google oauth unlinked successfully"
+          }
+        })
+      } 
+
+    }
+    catch(error){
+      res.status(500).json({
+        error: err,
+      });
+    }
   }
 }
