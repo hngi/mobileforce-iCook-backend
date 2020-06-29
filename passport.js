@@ -62,7 +62,7 @@ passport.use(
             email: profile.emails[0].value,
           },
         });
-
+        //@omodauda create a profile for a user registering with Google oauth
         const newProfile = new Profile({
           userId: newUser._id,
           email: profile.emails[0].value,
