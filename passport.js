@@ -91,10 +91,6 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log('profile', profile);
-        console.log('accessToken', accessToken);
-        console.log('refreshToken', refreshToken);
-
         const existingUser = await User.findOne({ 'facebook.id': profile.id });
         if (existingUser) {
           return done(null, existingUser);
@@ -118,7 +114,6 @@ passport.use(
         await newProfile.save();
         await newUser.profile.push(newProfile);
         await newUser.save();
-        console.log(newUser._id);
         return done(null, newUser);
       } catch (error) {
         return done(error, false, error.message);
@@ -140,7 +135,7 @@ passport.use(
 
         // If not, handle it
         if (!user) {
-          return done(null, false);
+          return done(new Error('Invalid email or password'), false);
         }
 
         // Check if the password is correct
@@ -148,7 +143,7 @@ passport.use(
 
         // If not, handle it
         if (!isMatch) {
-          return done(null, false);
+          return done(new Error('Authentication failed'), false);
         }
 
         done(null, user);

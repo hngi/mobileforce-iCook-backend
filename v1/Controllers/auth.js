@@ -26,7 +26,10 @@ module.exports = {
       const existingUser = await User.findOne({ 'google.email': email });
       const facebookUser = await User.findOne({ 'facebook.email': email });
       if (foundUser || existingUser || facebookUser) {
-        return res.status(403).json({ error: 'Email is already in use' });
+        return res.status(403).json({
+          status: 'fail',
+          error: 'Email is already in use'
+        });
       }
       if (!(name && phone && gender && email && password)) {
         return res.status(400).json({
@@ -84,7 +87,6 @@ module.exports = {
 
   signIn: async (req, res, next) => {
     // Generate token
-    console.log(req.user);
     try {
       const token = signToken(req.user);
       res
