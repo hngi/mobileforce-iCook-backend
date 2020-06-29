@@ -28,5 +28,8 @@ router.route("/forgotPassword").post(UsersController.forgotPassword);
 
 router.route("/resetPassword/:token").patch(UsersController.resetPassword);
 
+router.route("/unlink/google")
+  .patch(passportJWT, UsersController.unlink_google_account);
+
 
 module.exports = router;
