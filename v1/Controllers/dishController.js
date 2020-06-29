@@ -48,7 +48,7 @@ exports.createDish = async(req, res, next) => {
     })
   }
 }
-
+//Get dishes posted by a user @omodauda
 exports.get_all_dishes = async (req, res, next) => {
   try {
     const me = await Profile.findOne({
