@@ -9,6 +9,8 @@ router.post('/', passportJWT, dish_controller.createDish);
 
 router.get('/', passportJWT, dish_controller.get_all_dishes);
 
+// router.get('/me', passportJWT, dish_controller.get_user_dishes);
+
 router.get('/:id', passportJWT, dish_controller.get_dishes_by_ID);
 
 router.delete('/:id', passportJWT, dish_controller.delete_dish);
