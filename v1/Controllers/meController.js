@@ -3,43 +3,13 @@ const Jimp = require('jimp');
 const multer = require('multer') 
 const User = require('../../Models/authModel')
 const Dish = require('../../Models/dishModel')
-const uploadImage = require('../../Database/uploadImage')
+const upload = require('../../Database/uploadImage')
 const Profile = require('../../Models/profileModel')
 const PublicResponse = require('../../Helpers/model')
 
-const multerStorage = multer.memoryStorage()
 
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true)
-  }else {
-    cb(new Error('Not an image! Please upload only images', false))
-  }
-}
+exports.singleUpload = upload.single('photo');
 
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter
-})
-
-exports.uploadUserPhoto = upload.single('photo'),
-
-exports.resizeUserPhoto = async (req, res, next) => {
-  try{
-    if (!req.file) return next()
-  
-    req.file.filename = `user-${req.user._id}-${Date.now()}.jpeg`
-  
-    let image = await Jimp.read(req.file.buffer);
-      image.resize(256, 256)
-          .quality(90)
-          .write(`./public/img/users/${req.file.filename}`);
-  
-      next();
-  }catch(err) {
-    throw new Error("AM error occured! Please try again");
-  }
-}
 // @Usman Jun 28
 exports.get_me = async (req, res) => {
   try {
@@ -153,7 +123,6 @@ exports.update_profile = async (req, res) => {
   if (gender) fieldsToUpdate.gender = gender
   if (phone) fieldsToUpdate.phoneNumber = phone
   if (email) fieldsToUpdate.email = email
-  if (req.file) fieldsToUpdate.userImage = req.file.filename;
   try {
     let userProfile = await Profile.findOne({ userId: req.user._id })
 
@@ -189,5 +158,35 @@ exports.unlink_facebook = async (req, res) => {}
 exports.delete_account = async (req, res) => {}
 
 exports.upload_photo = async (req, res) => {
+    const fieldsToUpdate = {}
 
+    if (req.file) fieldsToUpdate.userImage = req.file.location;
+
+    try {
+        let userProfile = await Profile.findOne({ userId: req.user._id })
+    
+        if (!userProfile) {
+          throw new Error('Profile not found')
+        }
+    
+        userProfile = await Profile.findOneAndUpdate(
+          { userId: req.user._id },
+          { $set: fieldsToUpdate },
+          {
+            new: true
+          }
+        )
+        res.status(200).json({
+          status: 'success',
+          message: "Image uploaded successfully",
+          data: {
+              URL: req.file.location
+          }
+        })
+      } catch (err) {
+        res.status(500).json({
+          status: 'fail',
+          error: "Image upload unsuccessful! Try again later"
+        })
+      }
 }

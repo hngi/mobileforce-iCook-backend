@@ -1,34 +1,27 @@
 const AWS = require('aws-sdk')
-const path = require('path')
-const uuid = require("uuid")
-const s3 = new AWS.S3({
-    accessKeyId: process.env.AKIAZXTF3HPBUHHPX577,
-    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY
+const multer = require('multer')
+const multerS3 = require('multer-s3')
+
+AWS.config.update({
+    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId:process.env.AWS_ACCESS_KEY,
+    region:'us-east-2'
 })
 
+const s3 = new AWS.S3()
 
-module.exports = (file) => {
-    if (file.size > 512,000){
-        throw "One of your images is greater than 500kb"
-    }
-    let location = "";
-    const params = {
-        ACL: "public-read",
-        Bucket: "ichop-mobileforce",
-        Key: uuid.v4().toString() + path.extname(file.originalname),
-        Body: file.buffer,
-        ContentLength: file.size
-    }
-    
-    s3.upload(params, (err, data) => {
-        if (err){
-            throw err;
-        }
-        console.log("file uploaded")
-        location = data.Location         
-    })
+const upload = multer({
+    storage: multerS3({
+      s3: s3,
+      bucket: 'icook-images',
+      acl: 'public-read',
+      metadata: function (req, file, cb) {
+        cb(null, {fieldName: 'TESTING'});
+      },
+      key: function (req, file, cb) {
+        cb(null, `user-${req.user._id}-${Date.now()}.jpeg`)
+      }
+    }),
+  });
 
-    return location 
-
-     
-}
+module.exports = upload;
