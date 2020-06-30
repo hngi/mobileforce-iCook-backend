@@ -280,5 +280,36 @@ just ignore this email.Otherwise, you can reset your password using the link bel
         error: err,
       });
     }
-  }
+  },
+
+  //unlink facebook account
+  unlink_facebook_account: async (req, res, next) => {
+    try{
+      
+      const user = await User.findById(req.user._id);
+      if (user){
+         user.method = 'local';
+         user.local.email = user.facebook.email;
+         user.local.password = req.body.setPassword;
+         user.facebook = undefined;
+
+         await user.save();
+        return res.status(200).json({
+          status: "success",
+          error: "",
+          data:{
+            message: "Facebook oauth unlinked successfully"
+          }
+        })
+      } 
+
+    }
+    catch(error){
+      res.status(500).json({
+        error: err,
+      });
+    }
+  },
+
+
 }
