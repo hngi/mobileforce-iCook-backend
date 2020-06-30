@@ -11,6 +11,9 @@ router.get('/', passportJWT, me_controller.get_me)
 // get profile
 router.get('/auth', passportJWT, me_controller.get_auth)
 
+//get user dishes
+router.get('/dishes', passportJWT, me_controller.get_user_dishes);
+
 // get favourites
 router.get('/favourites', passportJWT, me_controller.get_favourites)
 

@@ -48,71 +48,34 @@ exports.createDish = async(req, res, next) => {
     })
   }
 }
-//Get dishes posted by a user @omodauda
+
+//Get all dishes in DB
+
 exports.get_all_dishes = async (req, res, next) => {
-  try {
-    const me = await Profile.findOne({
-      userId: req.user._id
-    });
-    const {lastSync, size=15, after} = req.query;
-    const date = lastSync ? new Date(req.query.lastSync) : new Date().setDate(new Date().getDate() - 3);
-    const _dishes = await Dish.find({
-      $and: [
-        {
-          $or: [
-            {
-              'chefId': {
-                $in: me.following.map(id => mongoose.Types.ObjectId(id.toString())),
-              }
-            },
-            {
-              'chefId': req.user._id
-            }
-          ],
-        },
-        {
-          'updatedAt': {
-            $gte: date 
-          }
-        }
-      ]
-    });
-    const isFavourite = id => ({ isFavourite: me.favourites.includes(id) });
-    const dishes = PublicResponse.dishes(_dishes, req, isFavourite); 
-    let foundIndex = 0;
-    let paginated = [];
 
-    if (after) {
-      foundIndex = dishes.findIndex(d => d._id.toLocaleString() === after.toLocaleString());
-      if (foundIndex >= 0) {
-        const start = foundIndex + 1;
-        paginated = dishes.slice(start, start + Number(size));
-      }
-    } else {
-      paginated = dishes.slice(foundIndex, Number(size));
-    }
-
-    const last = paginated[paginated.length - 1];
-    const lastToken = last ? last._id : null;
-
-    return res.status(200).json({
-      status: 'success',
-      error: '',
-      results: dishes.length,
+  try{
+    const dishes = await Dish.find();
+    return res
+    .status(200)
+    .json({
+      status: "success",
+      error: "",
+      result: dishes.length,
       data: {
-        total: dishes.length,
-        count: paginated.length,
-        dishes: paginated,
-        after: lastToken
+        dishes
       }
-    })
-  } catch (error) {
-    return res.status(404).json({
-      status: 'fail',
-      error: error.message
-    })
+    });
   }
-}
+  catch(error){
+    return res
+    .status(500)
+    .json({
+      status: "fail",
+      error: error.message
+    });
+  }
+};
+
 
 exports.get_dishes_by_ID = async (req, res, next) => {
   try {
