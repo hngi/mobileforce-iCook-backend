@@ -22,7 +22,7 @@ exports.sendEmail = async (recipient, message) => {
    // send email
 transporter.sendMail(data, (error, response) => {
     if (error) {
-        console.log(error);
+        new Error("An error occured! Please try again");
     }
 });
 

@@ -21,7 +21,10 @@ const profileSchema = new schema({
     default: '',
     enum: ['male', 'female', 'others'],
   },
-  userImage: String,
+  userImage: {
+    type: String,
+    default: 'default.jpg'
+  },
   country: {
     type: String,
   },

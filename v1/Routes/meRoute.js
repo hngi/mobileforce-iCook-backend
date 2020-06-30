@@ -5,6 +5,7 @@ const me_controller = require('../Controllers/meController')
 const passport = require('passport')
 const passportJWT = passport.authenticate('jwt', { session: false })
 
+
 router.get('/', passportJWT, me_controller.get_me)
 
 // get profile
@@ -17,7 +18,12 @@ router.get('/favourites', passportJWT, me_controller.get_favourites)
 router.get('/settings', passportJWT, me_controller.get_settings)
 
 // update profile
-router.patch('/update', passportJWT, me_controller.update_profile)
+router.patch(
+    '/update', 
+    passportJWT, 
+    me_controller.uploadUserPhoto,
+    me_controller.resizeUserPhoto,
+    me_controller.update_profile)
 
 // update settings
 router.put('/settings', passportJWT, me_controller.update_settings)
