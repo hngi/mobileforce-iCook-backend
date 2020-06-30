@@ -21,12 +21,7 @@ router.get('/favourites', passportJWT, me_controller.get_favourites)
 router.get('/settings', passportJWT, me_controller.get_settings)
 
 // update profile
-router.patch(
-    '/update', 
-    passportJWT, 
-    me_controller.uploadUserPhoto,
-    me_controller.resizeUserPhoto,
-    me_controller.update_profile)
+router.patch('/update', passportJWT, me_controller.update_profile)
 
 // update settings
 router.put('/settings', passportJWT, me_controller.update_settings)
@@ -38,9 +33,10 @@ router.delete('/unlink_google', passportJWT, me_controller.unlink_google)
 router.delete('/unlink_facebook', passportJWT, me_controller.unlink_facebook)
 
 // upload photo
-router.put('/upload_photo', passportJWT, me_controller.upload_photo)
+router.put('/upload_photo', passportJWT, me_controller.singleUpload,me_controller.upload_photo)
 
 // delete my account
 router.delete('/delete_account', passportJWT, me_controller.delete_account)
+
 
 module.exports = router
