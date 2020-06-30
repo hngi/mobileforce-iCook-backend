@@ -89,6 +89,8 @@ module.exports = {
     // Generate token
     try {
       const token = signToken(req.user);
+      const userDetails = await User.findById(req.user._id).populate('profile');
+      console.log(userDetails);
       res
         .header('x-auth-token', token)
         .status(200)
@@ -97,6 +99,8 @@ module.exports = {
           error: '',
           data: {
             user_id: req.user._id,
+            user_name: userDetails.profile[0].name,
+            email: userDetails.profile[0].email,
             token,
           },
         });

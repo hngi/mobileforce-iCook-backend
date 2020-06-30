@@ -17,13 +17,9 @@ app.use("/api/v1/authenticate", require("./v1/Routes/authRoute"));
 app.use("/api/v1/search", require("./v1/Routes/searchRoute"));
 
 app.use((err, req, res, next) => {
-  console.log(err);
   res.status(500).json({
     status: 'fail',
-    error: 'Something went wrong',
-    data: {
-      message: err.message,
-    }
+    error: err.message
   });
 });
 
