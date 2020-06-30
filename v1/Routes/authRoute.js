@@ -32,4 +32,8 @@ router.route("/unlink/google")
   .patch(passportJWT, UsersController.unlink_google_account);
 
 
+router.route("/unlink/facebook")
+  .patch(passportJWT, UsersController.unlink_facebook_account);
+
+
 module.exports = router;
