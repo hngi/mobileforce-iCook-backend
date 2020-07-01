@@ -62,7 +62,7 @@ dishSchema.post("findOneAndDelete", async function (document) {
   const userId = document.chefId;
   const dishId = document._id;
   await Profile.findOneAndUpdate(
-    { userId },
+    { user: userId },
     {
       $pull: {
         dishes: dishId,
