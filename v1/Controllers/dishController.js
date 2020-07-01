@@ -124,12 +124,12 @@ exports.edit_dish = async (req, res, next) => {
       throw new Error('Dish not found')
     }
 
-    if (dish.chefId.toString() !== userId) {
+    if (dish.chef.toString() !== userId) {
       throw new Error('Unauthorized')
     }
 
     dish = await Dish.findOneAndUpdate(
-      { chefId: req.user._id },
+      { chef: req.user._id },
       { $set: fieldsToUpdate },
       {
         new: true
@@ -159,7 +159,7 @@ exports.delete_dish = async (req, res, next) => {
       throw new Error('Not found')
     }
 
-    if (dish.chefId.toString() !== req.user._id.toString()) {
+    if (dish.chef.toString() !== req.user._id.toString()) {
       throw new Error('Unauthorized')
     }
     const data = await Dish.findOneAndDelete({ _id: req.params.id })
