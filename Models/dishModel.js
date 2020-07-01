@@ -44,7 +44,7 @@ dishSchema.methods._isLiked = function(userId) {
 
 dishSchema.post('findOneAndDelete', async function (document) {
   const Profile = mongoose.model('profile');
-  const userId = document.chefId;
+  const userId = document.chef;
   const dishId = document._id;
   await Profile.findOneAndUpdate({ user: userId }, {
     $pull: {
