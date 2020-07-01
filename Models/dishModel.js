@@ -46,7 +46,7 @@ dishSchema.post('findOneAndDelete', async function (document) {
   const Profile = mongoose.model('profile');
   const userId = document.chefId;
   const dishId = document._id;
-  await Profile.findOneAndUpdate({ userId }, {
+  await Profile.findOneAndUpdate({ user: userId }, {
     $pull: {
       dishes: dishId 
     }

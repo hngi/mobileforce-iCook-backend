@@ -14,7 +14,7 @@ exports.singleUpload = upload.single('photo');
 exports.get_me = async (req, res) => {
   try {
     const userId = req.user._id.toString()
-    const me = await Profile.findOne({ userId }).select([
+    const me = await Profile.findOne({ user: userId }).select([
       '-favourites',
       '-followers',
       '-following'
@@ -43,7 +43,7 @@ exports.get_me = async (req, res) => {
 exports.get_user_dishes = async (req, res, next) => {
   try {
     const me = await Profile.findOne({
-      userId: req.user._id
+      user: req.user._id
     });
     const {lastSync, size=15, after} = req.query;
     const date = lastSync ? new Date(req.query.lastSync) : new Date().setDate(new Date().getDate() - 3);
@@ -135,7 +135,7 @@ exports.get_favourites = async (req, res) => {
   const {size=15, after} = req.query;
   try {
     const userId = req.user._id.toString(); 
-    const me = await Profile.findOne({userId});
+    const me = await Profile.findOne({user: userId});
     let favourites = await Dish.find({
       '_id': {
         $in: me.favourites.map(id => mongoose.Types.ObjectId(id.toString()))
@@ -190,14 +190,14 @@ exports.update_profile = async (req, res) => {
   if (phone) fieldsToUpdate.phoneNumber = phone
   if (email) fieldsToUpdate.email = email
   try {
-    let userProfile = await Profile.findOne({ userId: req.user._id })
+    let userProfile = await Profile.findOne({ user: req.user._id })
 
     if (!userProfile) {
       throw new Error('Profile not found')
     }
 
     userProfile = await Profile.findOneAndUpdate(
-      { userId: req.user._id },
+      { user: req.user._id },
       { $set: fieldsToUpdate },
       {
         new: true
@@ -229,14 +229,14 @@ exports.upload_photo = async (req, res) => {
     if (req.file) fieldsToUpdate.userImage = req.file.location;
 
     try {
-        let userProfile = await Profile.findOne({ userId: req.user._id })
+        let userProfile = await Profile.findOne({ user: req.user._id })
     
         if (!userProfile) {
           throw new Error('Profile not found')
         }
     
         userProfile = await Profile.findOneAndUpdate(
-          { userId: req.user._id },
+          { user: req.user._id },
           { $set: fieldsToUpdate },
           {
             new: true

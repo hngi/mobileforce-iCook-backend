@@ -84,7 +84,7 @@ exports.get_dishes_by_ID = async (req, res, next) => {
     const dish = await Dish.findById(req.params.id)
     if (dish) {
       const me = await Profile.findOne({
-        userId: req.user._id
+        user: req.user._id
       })
       const isFavourite = me.favourites.includes(req.params.id)
       const d = PublicResponse.dish(dish, req, { isFavourite })
@@ -218,7 +218,7 @@ exports.toggle_favorite = async (req, res) => {
       throw new Error('Not found')
     }
     const me = await Profile.findOne({
-      userId: req.user._id
+      user: req.user._id
     })
     const isFavorite = me.favourites && me.favourites.includes(dishId)
 
