@@ -62,7 +62,7 @@ exports.get_all_dishes = async (req, res, next) => {
       error: "",
       result: dishes.length,
       data: {
-        dishes
+        dishes : PublicResponse.dishes(dishes, req)
       }
     });
   }

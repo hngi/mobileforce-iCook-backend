@@ -23,7 +23,7 @@ const profileSchema = new schema({
   },
   userImage: {
     type: String,
-    default: 'default.jpg'
+    default: 'https://icook-images.s3.us-east-2.amazonaws.com/user-5efa6f6b9e25253484f82ab2-1593520284454.jpeg'
   },
   country: {
     type: String,
