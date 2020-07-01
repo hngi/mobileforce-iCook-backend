@@ -53,14 +53,14 @@ exports.get_user_dishes = async (req, res, next) => {
         {
           $or: [
             {
-              chefId: {
+              chef: {
                 $in: me.following.map((id) =>
                   mongoose.Types.ObjectId(id.toString())
                 ),
               },
             },
             {
-              chefId: req.user._id,
+              chef: req.user._id,
             },
           ],
         },
