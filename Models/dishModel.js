@@ -6,7 +6,11 @@ const dishSchema = new schema({
     type: String,
     required: true
   },
-  chefId: {
+  description: {
+    type: String,
+    required: true
+  },
+  chef: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "profile"
   },

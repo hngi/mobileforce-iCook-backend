@@ -9,23 +9,25 @@ exports.createDish = async(req, res, next) => {
     const{
       name,
       recipe,
+      description,
       healthBenefits,
       ingredients,
     } = req.body;
 
     const userId = req.user._id;
 
+    const findProfile = await User.findById(userId);
+    const profileId = findProfile.profile[0]._id
+
     const dish = new Dish({
       name: name,
       recipe: recipe,
+      description,
       healthBenefits: healthBenefits,
       ingredients: ingredients,
-      chefId: userId
-    })
+      chef: profileId 
+    });
 
-    const findProfile = await User.findById(userId).populate('profile')
-
-    const profileId = findProfile.profile[0]._id
 
     await Profile.findByIdAndUpdate(
       profileId,
@@ -54,7 +56,7 @@ exports.createDish = async(req, res, next) => {
 exports.get_all_dishes = async (req, res, next) => {
 
   try{
-    const dishes = await Dish.find();
+    const dishes = await Dish.find().populate({path: 'chef', select: 'name _id userImage' });
     return res
     .status(200)
     .json({
