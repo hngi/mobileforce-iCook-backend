@@ -235,8 +235,6 @@ exports.addCommentToDish = async (req, res, next) => {
   try {
     const user = await Profile.findOne({ userId: req.user.id }).select('-password')
     const dish = await Dish.findById(req.params.dishId)
-    console.log('user', user)
-    console.log('dish', dish)
 
     if (!user && !dish) {
       throw new Error('Not Found')
@@ -247,7 +245,6 @@ exports.addCommentToDish = async (req, res, next) => {
       name: user.name,
       user: req.user.id
     }
-    console.log('comment', newComment)
 
     dish.comments.unshift(newComment)
 
@@ -269,11 +266,9 @@ exports.addCommentToDish = async (req, res, next) => {
 exports.removeDishComment = async (req, res, next) => {
   try {
     const dish = await Dish.findById(req.params.dishId)
-    console.log('dish', dish)
 
     // Pull out comment
     const comment = dish.comments.find((comment) => comment.id === req.params.commentId)
-    console.log('comment', comment)
 
     if (!comment) {
       throw new Error('Not Found')
