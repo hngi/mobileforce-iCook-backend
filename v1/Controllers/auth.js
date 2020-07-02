@@ -88,9 +88,11 @@ module.exports = {
   signIn: async (req, res, next) => {
     // Generate token
     try {
+
       const token = signToken(req.user);
+      
       const userDetails = await User.findById(req.user._id).populate('profile');
-      console.log(userDetails);
+     
       res
         .header('x-auth-token', token)
         .status(200)
@@ -114,12 +116,30 @@ module.exports = {
 
   updateUserPassword: async (req, res, next) => {
     try {
-      const user = await User.findById(req.user._id);
 
-      // Check current password
-      if (!(await user.isValidPassword(req.body.currentPassword))) {
-        throw new Error('Password is incorrect');
+      if(!req.body.currentPassword || !req.body.newPassword){
+        return res.status(400).json({
+          status: 'fail',
+          message: 'current or new password property not provided'
+        })
       }
+      if(req.body.currentPassword === req.body.newPassword){
+        return res.status(400).json({
+          status: 'fail',
+          message: "Current password and new password can't be thesame"
+        })
+      }
+      const user = await User.findById(req.user._id);
+    
+      // Check current password
+     let check = await user.isValidPassword(req.body.currentPassword);
+
+     if(!check){
+       return res.status(200).json({
+         status: 'fail',
+         message: 'Invalid password provided!'
+       })
+     }
 
       user.local.password = req.body.newPassword;
       await user.save();
@@ -184,7 +204,7 @@ module.exports = {
 
   forgotPassword: async (req, res, next) => {
     // 1) Get user based on POSTed email
-  const user = await User.findOne({ "local.email": req.body.email });
+  const user = await User.findById(req.user._id);
   //console.log("User",user)
   if (!user) {
     return res.status(400).json({
@@ -193,30 +213,33 @@ module.exports = {
     })
   }
   // 2) Generate the rendom reset token
-  const resetToken = user.createPasswordResetToken();
-  await user.save({ validateBeforeSave: false });
+  const result = user.createPasswordResetToken();
+  
+  await User.findByIdAndUpdate(user._id, { "local.passwordResetToken": result.resetToken,
+    "local.passwordResetExpires":result.resetExpires},function(err, result) {
+      if (err) {
+        return res.status(500).json({
+          status: "fail",
+          message: "An error occured! Try again later"
+        })
+      }
+    })
+  //await user.save({ validateBeforeSave: false });
+  const token = signToken(req.user);
   //3) Sent it to user's email
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/users/resetPassword/${resetToken}`;
-
+ 
   const text = `We've received a request to reset your password. If you didn't make the request,
-just ignore this email.Otherwise, you can reset your password using the link below:\n ${resetURL}`;
+just ignore this email.Otherwise, you can reset your password using the following token:\n ${result.resetToken}`;
 
   const subject = 'Your password reset token (valid for 10 min)';
   try {
     await sendEmail(user.local.email, { subject, text });
     res.status(200).json({
       status: 'success',
-      message: 'Token sent Successfully!'
+      message: 'Token sent Successfully!',
+      token
     });
   } catch (err) {
-    user.PasswordResetToken = undefined;
-    user.passwordResetExpires = undefined;
-    await user.save({ validateBeforeSave: false });
-
-    console.log(err);
-
     return res.status(500).json({
       status: 'fail',
       message: 'There was an error sending the email. Try agaim later'
@@ -224,33 +247,53 @@ just ignore this email.Otherwise, you can reset your password using the link bel
   }
   },
 
-  resetPassword: async (req, res, next) => {
+  confirmToken: async (req, res, next) => {
       // 1) Get user based on the token
-    const hashedToken = crypto
-    .createHash('sha256')
-    .update(req.params.token)
-    .digest('hex');
+      const ResetToken = req.body.token
 
-    const user = await User.findOne({
-    "local.passwordResetToken": hashedToken,
-    "local.passwordResetExpires": { $gt: Date.now() }
+      const user = await User.findOne({
+      "local.passwordResetToken": ResetToken,
+      "local.passwordResetExpires": { $gt: Date.now() }
+      });
+  
+      // 2) If token has not expired, and there is user, set the new password
+      if (!user) {
+      return res.status(400).json({
+        status: "fail",
+        message: 'Token is invalid or has expired'
+      })
+      }
+
+      const token = signToken(req.user);
+
+
+      res.status(200).json({
+        status: 'successful',
+        message: "Token Valid",
+        token
+      })
+  },
+
+  resetPassword: async (req, res, next) => {
+
+    const { password } = req.body;
+
+    if(!password) return res.status(400).json({
+      status: 'fail',
+      message: 'New Password is not provided'
     });
 
-    // 2) If token has not expired, and there is user, set the new password
-    if (!user) {
-    return res.status(400).json({
-      status: "fail",
-      message: 'Token is invalid or has expired'
-    })
-    }
+    const user = await User.findById(req.user._id)
 
+    if(!user) return res.status(400).json({
+      status: 'fail',
+      message: "User doesn't exist"
+    });
 
-    // 3) Log the user in, send JWT
-    user.local.password = req.body.password;
-    user.local.passwordResetToken = undefined;
-    user.local.passwordResetExpires = undefined;
+    user.resetPassword(password);
+
     await user.save();
-    const token = signToken(user._id);
+    const token = signToken(req.user);
 
     res.status(200).json({
     status: 'successful',
