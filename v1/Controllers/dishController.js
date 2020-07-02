@@ -1,19 +1,14 @@
-const Dish = require("../../Models/dishModel");
-const uploadImage = require("../../Database/uploadImage");
-const Profile = require("../../Models/profileModel");
-const User = require('../../Models/authModel');
-const PublicResponse = require('../../Helpers/model');
+const Dish = require('../../Models/dishModel')
+const uploadImage = require('../../Database/uploadImage')
+const Profile = require('../../Models/profileModel')
+const User = require('../../Models/authModel')
+const PublicResponse = require('../../Helpers/model')
 
-exports.createDish = async(req, res, next) => {
-  try{
-    const{
-      name,
-      recipe,
-      healthBenefits,
-      ingredients,
-    } = req.body;
+exports.createDish = async (req, res, next) => {
+  try {
+    const { name, recipe, healthBenefits, ingredients } = req.body
 
-    const userId = req.user._id;
+    const userId = req.user._id
 
     const dish = new Dish({
       name: name,
@@ -52,30 +47,23 @@ exports.createDish = async(req, res, next) => {
 //Get all dishes in DB
 
 exports.get_all_dishes = async (req, res, next) => {
-
-  try{
-    const dishes = await Dish.find();
-    return res
-    .status(200)
-    .json({
-      status: "success",
-      error: "",
+  try {
+    const dishes = await Dish.find()
+    return res.status(200).json({
+      status: 'success',
+      error: '',
       result: dishes.length,
       data: {
-        dishes
+        dishes: PublicResponse.dishes(dishes, req)
       }
-    });
-  }
-  catch(error){
-    return res
-    .status(500)
-    .json({
-      status: "fail",
+    })
+  } catch (error) {
+    return res.status(500).json({
+      status: 'fail',
       error: error.message
-    });
+    })
   }
-};
-
+}
 
 exports.get_dishes_by_ID = async (req, res, next) => {
   try {
@@ -238,6 +226,74 @@ exports.toggle_favorite = async (req, res) => {
     return res.status(400).json({
       status: 'fail',
       error: error.message
+    })
+  }
+}
+
+// /api/v1/dish/comment/:dishId
+exports.addCommentToDish = async (req, res, next) => {
+  try {
+    const user = await Profile.findOne({ userId: req.user.id }).select('-password')
+    const dish = await Dish.findById(req.params.dishId)
+
+    if (!user && !dish) {
+      throw new Error('Not Found')
+    }
+
+    const newComment = {
+      text: req.body.text,
+      name: user.name,
+      user: req.user.id
+    }
+
+    dish.comments.unshift(newComment)
+
+    await dish.save()
+    res.status(200).json({
+      status: 'success',
+      data: dish.comments,
+      error: ''
+    })
+  } catch (err) {
+    res.json({
+      status: 'fail',
+      error: err.message
+    })
+  }
+}
+
+// /api/v1/dish/comments/:dishId/:commentId
+exports.removeDishComment = async (req, res, next) => {
+  try {
+    const dish = await Dish.findById(req.params.dishId)
+
+    // Pull out comment
+    const comment = dish.comments.find((comment) => comment.id === req.params.commentId)
+
+    if (!comment) {
+      throw new Error('Not Found')
+    }
+
+    // Check user
+    if (comment.user.toString() !== req.user.id) {
+      throw new Error('User nor authorized')
+    }
+
+    const removeIndex = dish.comments.map((comment) => comment.user.toString()).indexOf(req.user.id)
+
+    dish.comments.splice(removeIndex, 1)
+
+    await dish.save()
+
+    res.status(200).json({
+      status: 'success',
+      data: dish.comments,
+      error: ''
+    })
+  } catch (err) {
+    res.json({
+      status: 'fail',
+      error: err.message
     })
   }
 }
