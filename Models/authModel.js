@@ -66,7 +66,7 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-userSchema.methods.isValidPassword = async function (newPassword, res) {
+userSchema.methods.isValidPassword = async function (newPassword) {
   try {
     return await bcrypt.compare(newPassword, this.local.password);
   } catch (error) {
@@ -75,17 +75,20 @@ userSchema.methods.isValidPassword = async function (newPassword, res) {
 };
 
 userSchema.methods.createPasswordResetToken = function() {
-  const resetToken = crypto.randomBytes(32).toString('hex');
 
-  this.local.passwordResetToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
+  const resetToken =  Math.floor(100000 + Math.random() * 900000);
 
   //console.log({ resetToken }, this.local.passwordResetToken);
-  this.local.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+   const resetExpires = Date.now() + 10 * 60 * 1000;
 
-  return resetToken;
+  return {resetToken,resetExpires};
+};
+
+userSchema.methods.resetPassword = function(newPassword) {
+
+  this.local.passwordResetToken = undefined;
+  this.local.passwordResetExpires = undefined;
+  this.local.password = newPassword;
 };
 
 // Create a model
