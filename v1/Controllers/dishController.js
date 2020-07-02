@@ -20,14 +20,16 @@ exports.createDish = async (req, res, next) => {
       healthBenefits: healthBenefits,
       ingredients: ingredients,
       chef: profileId,
-    }).populate("chef");
+    });
 
     await Profile.findByIdAndUpdate(
       profileId,
       { $push: { dishes: dish } },
       { new: true, useFindAndModify: false }
     );
-    await dish.save();
+    await (await dish.save())
+      .populate({ path: "chef", select: "userImage name _id" })
+      .execPopulate();
     return res.status(201).json({
       status: "success",
       error: "",
