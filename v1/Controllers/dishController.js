@@ -48,7 +48,7 @@ exports.createDish = async (req, res, next) => {
 
 exports.get_all_dishes = async (req, res, next) => {
   try {
-    const dishes = await Dish.find()
+    const dishes = await Dish.find().populate({path: 'chefId', select:['name', 'userImage']})
     return res.status(200).json({
       status: 'success',
       error: '',
