@@ -10,7 +10,7 @@ exports.search = async (req, res) => {
   let total;
   switch(type.toLowerCase()) {
     case 'dish': {
-      const _dishes = await Dish.find({name:{ $regex: new RegExp("^" + name.toLowerCase(), "i") }});
+      const _dishes = await Dish.find({name:{ $regex: new RegExp("^" + name.toLowerCase(), "i") }}).populate({path: 'chefId', select:['name', 'userImage']});
       result = PublicResponse.dishes(_dishes, req);
       total = _dishes.length;
       break;

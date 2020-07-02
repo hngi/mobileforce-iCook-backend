@@ -52,7 +52,7 @@ exports.createDish = async (req, res, next) => {
 
 exports.get_all_dishes = async (req, res, next) => {
   try {
-    const dishes = await Dish.find().populate({path: 'chefId', select:['name', 'userImage']})
+    const dishes = await Dish.find().sort('-createdAt').populate({path: 'chefId', select:['name', 'userImage']})
     return res.status(200).json({
       status: 'success',
       error: '',
@@ -71,7 +71,7 @@ exports.get_all_dishes = async (req, res, next) => {
 
 exports.get_dishes_by_ID = async (req, res, next) => {
   try {
-    const dish = await Dish.findById(req.params.id)
+    const dish = await Dish.findById(req.params.id).populate({path: 'chefId', select:['name', 'userImage']})
     if (dish) {
       const me = await Profile.findOne({
         userId: req.user._id
