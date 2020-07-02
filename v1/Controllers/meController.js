@@ -231,7 +231,7 @@ exports.delete_account = async (req, res) => {
   const user = await User.findById(req.user.id);
   const userProfile = await findOne({ userId: req.user.id });
 
-  const dishes = await Dish.findOne({ chefId: userProfile.id });
+  await Dish.findOne({ chef: userProfile.id });
 };
 
 exports.upload_photo = async (req, res) => {
