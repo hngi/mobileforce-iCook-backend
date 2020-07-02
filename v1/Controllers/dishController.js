@@ -6,9 +6,12 @@ const PublicResponse = require("../../Helpers/model");
 
 exports.createDish = async (req, res, next) => {
   try {
-    const { name, recipe, healthBenefits, ingredients } = req.body;
+    const { name, recipe, description, healthBenefits, ingredients } = req.body;
 
     const userId = req.user._id;
+    const findProfile = await User.findById(userId);
+    const profileId = findProfile.profile[0]._id;
+
     const findProfile = await User.findById(userId);
     const profileId = findProfile.profile[0]._id;
 
