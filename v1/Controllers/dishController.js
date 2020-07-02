@@ -12,9 +12,6 @@ exports.createDish = async (req, res, next) => {
     const findProfile = await User.findById(userId);
     const profileId = findProfile.profile[0]._id;
 
-    const findProfile = await User.findById(userId);
-    const profileId = findProfile.profile[0]._id;
-
     const dish = new Dish({
       name: name,
       recipe: recipe,
