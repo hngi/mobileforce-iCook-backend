@@ -24,9 +24,11 @@ router
   .route('/oauth/facebook')
   .post(passport.authenticate('facebookToken', { session: false }), UsersController.facebookOAuth);
 
-router.route("/forgotPassword").post(UsersController.forgotPassword);
+router.route("/forgotPassword").put(passportJWT,UsersController.forgotPassword);
 
-router.route("/resetPassword/:token").patch(UsersController.resetPassword);
+router.route("/confirmToken").put(passportJWT,UsersController.confirmToken);
+
+router.route("/resetPassword/").put(passportJWT,UsersController.resetPassword);
 
 router.route("/unlink/google")
   .patch(passportJWT, UsersController.unlink_google_account);
