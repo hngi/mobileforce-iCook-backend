@@ -11,6 +11,7 @@ exports.createDish = async (req, res, next) => {
     const userId = req.user._id;
     const findProfile = await User.findById(userId);
     const profileId = findProfile.profile[0]._id;
+    console.log(ingredients);
 
     const dish = new Dish({
       name: name,
@@ -19,7 +20,7 @@ exports.createDish = async (req, res, next) => {
       healthBenefits: healthBenefits,
       ingredients: ingredients,
       chef: profileId,
-    });
+    }).populate("chef");
 
     await Profile.findByIdAndUpdate(
       profileId,

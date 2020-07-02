@@ -7,12 +7,10 @@ const dishSchema = new schema(
       type: String,
       required: true,
     },
-    chef: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "profile",
-      },
-    ],
+    chef: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "profile",
+    },
     dishImages: {
       type: [String],
     },
@@ -34,14 +32,11 @@ const dishSchema = new schema(
       {
         user: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "users",
+          ref: "profile",
         },
         text: {
           type: String,
           required: true,
-        },
-        name: {
-          type: String,
         },
         date: {
           type: Date,
