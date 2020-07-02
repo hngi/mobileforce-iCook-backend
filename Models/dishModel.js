@@ -1,75 +1,72 @@
-const mongoose = require('mongoose')
-const schema = mongoose.Schema
+const mongoose = require("mongoose");
+const schema = mongoose.Schema;
 
 const dishSchema = new schema(
   {
     name: {
       type: String,
-      required: true
+      required: true,
     },
-    chefId: [{
+    chef: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'profile'
-    }],
+      ref: "profile",
+    },
     dishImages: {
-      type: [String]
+      type: [String],
     },
     recipe: {
-      type: [String]
+      type: [String],
     },
     likes: {
       type: [String], // You'll be able to make intelligent query based on user IDs
-      default: []
+      default: [],
     },
     ingredients: {
       type: [String],
-      required: true
+      required: true,
     },
     healthBenefits: {
-      type: [String]
+      type: [String],
     },
     comments: [
       {
         user: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'users'
+          ref: "profile",
         },
         text: {
           type: String,
-          required: true
-        },
-        name: {
-          type: String
+          required: true,
         },
         date: {
           type: Date,
-          default: Date.now
-        }
-      }
-    ]
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true }
-)
+);
 
 dishSchema.methods._isLiked = function (userId) {
-  return this.likes.includes(userId)
-}
+  return this.likes.includes(userId);
+};
 
-dishSchema.post('findOneAndDelete', async function (document) {
-  const Profile = mongoose.model('profile')
-  const userId = document.chefId
-  const dishId = document._id
+dishSchema.post("findOneAndDelete", async function (document) {
+  const Profile = mongoose.model("profile");
+  const userId = document.chef;
+  const dishId = document._id;
   await Profile.findOneAndUpdate(
-    { userId },
+    { user: userId },
     {
       $pull: {
-        dishes: dishId
-      }
+        dishes: dishId,
+      },
     },
     { new: true }
-  )
-})
+  );
+});
 
-const Dish = mongoose.model('dish', dishSchema)
+const Dish = mongoose.model("dish", dishSchema);
 
-module.exports = Dish
+module.exports = Dish;
