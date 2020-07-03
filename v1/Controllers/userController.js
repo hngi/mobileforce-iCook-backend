@@ -27,7 +27,7 @@ exports.get_all_users = async (req, res, next) => {
 exports.get_user_by_id = async (req, res, next) => {
   try {
     const userId = req.params.id
-    const user = await Profile.findOne({ user: userId })
+    const user = await Profile.findOne({ userId })
       .select(['-email', '-favourites'])
       .populate('dishes')
     const _user = PublicResponse.user(user, req)
@@ -113,7 +113,7 @@ exports.followUser = async (req, res, next) => {
       throw new Error('You cant follow your self')
     }
 
-    const userProfile = await Profile.findOne({ user: id })
+    const userProfile = await Profile.findOne({ userId: id })
     const profileId = userProfile._id
     const following = userProfile.following
 
@@ -163,7 +163,7 @@ exports.unfollowUser = async (req, res, next) => {
       throw new Error('You cant unfollow your self')
     }
 
-    const userProfile = await Profile.findOne({ user: id })
+    const userProfile = await Profile.findOne({ userId: id })
     const profileId = userProfile._id
     const following = userProfile.following
 
