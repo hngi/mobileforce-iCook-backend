@@ -279,12 +279,22 @@ exports.addCommentToDish = async (req, res, next) => {
 }
 
 // get comments for particular dish
-// GET /api/v1/dishes/comments/dishId
-exports.getDishComment = (req, res, next) => {
+// GET /api/v1/dishes/comments/:dishId
+exports.getDishComment = async (req, res, next) => {
   try {
-      const comment
+    const comments = await Comment.find({ dish: req.params.dishId }).sort({ createdAt: -1 })
+
+    res.status(200).json({
+      status: 'success',
+      count: comments.length,
+      comments,
+      error: ''
+    })
   } catch (err) {
-    
+    res.json({
+      status: 'fail',
+      error: err.message
+    })
   }
 }
 
