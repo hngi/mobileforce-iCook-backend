@@ -243,13 +243,12 @@ exports.toggle_favorite = async (req, res) => {
 
 // POST /api/v1/dish/comment/:dishId
 exports.addCommentToDish = async (req, res, next) => {
-  // console.log(req.user)
   try {
     const user = await Profile.findOne({ userId: req.user.id }).populate({
       path: 'profile',
       select: 'id name'
     })
-    // console.log('user', user)
+
     const dish = await Dish.findById(req.params.dishId)
 
     if (!user && !dish) {
