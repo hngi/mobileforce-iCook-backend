@@ -279,7 +279,7 @@ just ignore this email.Otherwise, you can reset your password using the followin
         message: 'Token is invalid or has expired'
       })
       }
-      await User.findOneAndUpdate(user._id,
+      await User.findOneAndUpdate({_id:user._id},
         {
           "local.passwordResetToken": null,
           "local.passwordResetExpires": null
