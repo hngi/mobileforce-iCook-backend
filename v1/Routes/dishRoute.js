@@ -25,6 +25,6 @@ router.get('/comments/:dishId', passportJWT, dish_controller.getDishComment)
 
 router.post('/comments/:dishId', passportJWT, dish_controller.addCommentToDish)
 
-router.delete('/comments/:dishId/:commentId', passportJWT, dish_controller.removeDishComment)
+router.delete('/comments/:commentId', passportJWT, dish_controller.removeDishComment)
 
 module.exports = router

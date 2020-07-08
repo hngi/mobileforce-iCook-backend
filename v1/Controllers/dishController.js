@@ -297,14 +297,12 @@ exports.getDishComment = async (req, res, next) => {
   }
 }
 
-// DELETE /api/v1/dish/comments/:dishId/:commentId
+// DELETE /api/v1/dish/comments/:commentId
 exports.removeDishComment = async (req, res, next) => {
   try {
-    const dish = await Dish.findById(req.params.dishId)
-
     const comment = await Comment.findById(req.params.commentId)
 
-    if (!dish || !comment) {
+    if (!comment) {
       throw new Error('Not Found')
     }
 
