@@ -12,8 +12,11 @@ exports.singleUpload = upload.single('photo')
 // @Usman Jun 28
 exports.get_me = async (req, res) => {
   try {
-    const userId = req.user._id.toString()
-    const me = await Profile.findOne({ userId }).select(['-favourites', '-followers', '-following'])
+
+    const userId = req.user._id.toString();
+    const me = await Profile.findOne({ userId })
+      .select(["-favourites", "-followers", "-following"])
+      .populate("dishes");
 
     if (me) {
       res.status(200).json({
