@@ -21,8 +21,10 @@ router.put('/toggle_like/:id', passportJWT, dish_controller.toggle_like)
 
 router.put('/toggle_favourite/:id', passportJWT, dish_controller.toggle_favorite)
 
+router.get('/comments/:dishId', passportJWT, dish_controller.getDishComment)
+
 router.post('/comments/:dishId', passportJWT, dish_controller.addCommentToDish)
 
-router.delete('/comments/:dishId/:commentId', passportJWT, dish_controller.removeDishComment)
+router.delete('/comments/:commentId', passportJWT, dish_controller.removeDishComment)
 
 module.exports = router

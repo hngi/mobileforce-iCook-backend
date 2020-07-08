@@ -2,7 +2,9 @@ const Dish = require('../../Models/dishModel')
 const uploadImage = require('../../Database/uploadImage')
 const Profile = require('../../Models/profileModel')
 const User = require('../../Models/authModel')
+const Comment = require('../../Models/commentModel')
 const PublicResponse = require('../../Helpers/model')
+const { findByIdAndRemove } = require('../../Models/commentModel')
 
 exports.createDish = async (req, res, next) => {
   try {
@@ -52,7 +54,9 @@ exports.createDish = async (req, res, next) => {
 
 exports.get_all_dishes = async (req, res, next) => {
   try {
-    const dishes = await Dish.find().sort('-createdAt').populate({path: 'chefId', select:['name', 'userImage']})
+    const dishes = await Dish.find()
+      .sort('-createdAt')
+      .populate({ path: 'chefId', select: ['name', 'userImage'] })
     return res.status(200).json({
       status: 'success',
       error: '',
@@ -71,7 +75,10 @@ exports.get_all_dishes = async (req, res, next) => {
 
 exports.get_dishes_by_ID = async (req, res, next) => {
   try {
-    const dish = await Dish.findById(req.params.id).populate({path: 'chefId', select:['name', 'userImage']})
+    const dish = await Dish.findById(req.params.id).populate({
+      path: 'chefId',
+      select: ['name', 'userImage']
+    })
     if (dish) {
       const me = await Profile.findOne({
         userId: req.user._id
@@ -234,28 +241,32 @@ exports.toggle_favorite = async (req, res) => {
   }
 }
 
-// /api/v1/dish/comment/:dishId
+// POST /api/v1/dish/comment/:dishId
 exports.addCommentToDish = async (req, res, next) => {
   try {
-    const user = await Profile.findOne({ userId: req.user.id }).select('-password')
+    const user = await Profile.findOne({ userId: req.user.id }).populate({
+      path: 'profile',
+      select: 'id name'
+    })
+
     const dish = await Dish.findById(req.params.dishId)
 
     if (!user && !dish) {
       throw new Error('Not Found')
     }
 
-    const newComment = {
+    const newComment = new Comment({
       text: req.body.text,
       name: user.name,
-      user: req.user.id
-    }
+      user: req.user.id,
+      dish: req.params.dishId
+    })
+    console.log('newComment', newComment)
+    await newComment.save()
 
-    dish.comments.unshift(newComment)
-
-    await dish.save()
     res.status(200).json({
       status: 'success',
-      data: dish.comments,
+      data: newComment,
       error: ''
     })
   } catch (err) {
@@ -266,13 +277,30 @@ exports.addCommentToDish = async (req, res, next) => {
   }
 }
 
-// /api/v1/dish/comments/:dishId/:commentId
+// get comments for particular dish
+// GET /api/v1/dishes/comments/:dishId
+exports.getDishComment = async (req, res, next) => {
+  try {
+    const comments = await Comment.find({ dish: req.params.dishId }).sort({ createdAt: -1 })
+
+    res.status(200).json({
+      status: 'success',
+      count: comments.length,
+      comments,
+      error: ''
+    })
+  } catch (err) {
+    res.json({
+      status: 'fail',
+      error: err.message
+    })
+  }
+}
+
+// DELETE /api/v1/dish/comments/:commentId
 exports.removeDishComment = async (req, res, next) => {
   try {
-    const dish = await Dish.findById(req.params.dishId)
-
-    // Pull out comment
-    const comment = dish.comments.find((comment) => comment.id === req.params.commentId)
+    const comment = await Comment.findById(req.params.commentId)
 
     if (!comment) {
       throw new Error('Not Found')
@@ -283,15 +311,11 @@ exports.removeDishComment = async (req, res, next) => {
       throw new Error('User nor authorized')
     }
 
-    const removeIndex = dish.comments.map((comment) => comment.user.toString()).indexOf(req.user.id)
-
-    dish.comments.splice(removeIndex, 1)
-
-    await dish.save()
+    await Comment.findByIdAndRemove(req.params.commentId)
 
     res.status(200).json({
       status: 'success',
-      data: dish.comments,
+      message: 'Commment deleted',
       error: ''
     })
   } catch (err) {
