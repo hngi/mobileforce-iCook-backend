@@ -2,6 +2,7 @@ const Dish = require('../../Models/dishModel')
 const uploadImage = require('../../Database/uploadImage')
 const Profile = require('../../Models/profileModel')
 const User = require('../../Models/authModel')
+const Comment = require('../../Models/commentModel')
 const PublicResponse = require('../../Helpers/model')
 
 exports.createDish = async (req, res, next) => {
@@ -52,7 +53,9 @@ exports.createDish = async (req, res, next) => {
 
 exports.get_all_dishes = async (req, res, next) => {
   try {
-    const dishes = await Dish.find().sort('-createdAt').populate({path: 'chefId', select:['name', 'userImage']})
+    const dishes = await Dish.find()
+      .sort('-createdAt')
+      .populate({ path: 'chefId', select: ['name', 'userImage'] })
     return res.status(200).json({
       status: 'success',
       error: '',
@@ -71,7 +74,10 @@ exports.get_all_dishes = async (req, res, next) => {
 
 exports.get_dishes_by_ID = async (req, res, next) => {
   try {
-    const dish = await Dish.findById(req.params.id).populate({path: 'chefId', select:['name', 'userImage']})
+    const dish = await Dish.findById(req.params.id).populate({
+      path: 'chefId',
+      select: ['name', 'userImage']
+    })
     if (dish) {
       const me = await Profile.findOne({
         userId: req.user._id
@@ -236,26 +242,31 @@ exports.toggle_favorite = async (req, res) => {
 
 // /api/v1/dish/comment/:dishId
 exports.addCommentToDish = async (req, res, next) => {
+  // console.log(req.user)
   try {
-    const user = await Profile.findOne({ userId: req.user.id }).select('-password')
+    const user = await Profile.findOne({ userId: req.user.id }).populate({
+      path: 'profile',
+      select: 'id name'
+    })
+    // console.log('user', user)
     const dish = await Dish.findById(req.params.dishId)
 
     if (!user && !dish) {
       throw new Error('Not Found')
     }
 
-    const newComment = {
+    const newComment = new Comment({
       text: req.body.text,
       name: user.name,
-      user: req.user.id
-    }
+      user: req.user.id,
+      dish: req.params.dishId
+    })
+    console.log('newComment', newComment)
+    await newComment.save()
 
-    dish.comments.unshift(newComment)
-
-    await dish.save()
     res.status(200).json({
       status: 'success',
-      data: dish.comments,
+      data: newComment,
       error: ''
     })
   } catch (err) {
