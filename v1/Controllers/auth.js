@@ -86,13 +86,13 @@ module.exports = {
   },
 
   signIn: async (req, res, next) => {
-    // Generate token
+    let userDetails;
     try {
 
       const token = signToken(req.user);
       
-      const userDetails = await User.findById(req.user._id).populate('profile');
-     
+      userDetails = await User.findById(req.user._id).populate('profile');
+     console.log(userDetails);
       res
         .header('x-auth-token', token)
         .status(200)
@@ -203,18 +203,27 @@ module.exports = {
   },
 
   forgotPassword: async (req, res, next) => {
+    const {email} = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        status: "fail",
+        message: 'Email not provided'
+      })
+      }
+
     // 1) Get user based on POSTed email
-  const user = await User.findById(req.user._id);
+  const user = await User.findOne({"local.email":email});
   //console.log("User",user)
   if (!user) {
     return res.status(400).json({
       status: "fail",
-      message: "There is no user with email address"
+      message: "User doesn't exist"
     })
   }
   // 2) Generate the rendom reset token
   const result = user.createPasswordResetToken();
-  
+
   await User.findByIdAndUpdate(user._id, { "local.passwordResetToken": result.resetToken,
     "local.passwordResetExpires":result.resetExpires},function(err, result) {
       if (err) {
@@ -224,9 +233,6 @@ module.exports = {
         })
       }
     })
-  //await user.save({ validateBeforeSave: false });
-  const token = signToken(req.user);
-  //3) Sent it to user's email
  
   const text = `We've received a request to reset your password. If you didn't make the request,
 just ignore this email.Otherwise, you can reset your password using the following token:\n ${result.resetToken}`;
@@ -237,9 +243,9 @@ just ignore this email.Otherwise, you can reset your password using the followin
     res.status(200).json({
       status: 'success',
       message: 'Token sent Successfully!',
-      token
     });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({
       status: 'fail',
       message: 'There was an error sending the email. Try agaim later'
@@ -251,11 +257,18 @@ just ignore this email.Otherwise, you can reset your password using the followin
       // 1) Get user based on the token
       const ResetToken = req.body.token
 
+      if (!ResetToken) {
+        return res.status(400).json({
+          status: "fail",
+          message: 'Token not provided'
+        })
+        }
+
       const user = await User.findOne({
       "local.passwordResetToken": ResetToken,
       "local.passwordResetExpires": { $gt: Date.now() }
       });
-  
+      
       // 2) If token has not expired, and there is user, set the new password
       if (!user) {
       return res.status(400).json({
@@ -263,27 +276,27 @@ just ignore this email.Otherwise, you can reset your password using the followin
         message: 'Token is invalid or has expired'
       })
       }
-
-      const token = signToken(req.user);
-
-
+      await User.findOneAndUpdate(user._id,
+        {
+          "local.passwordResetToken": null,
+          "local.passwordResetExpires": null
+        });
       res.status(200).json({
         status: 'successful',
         message: "Token Valid",
-        token
       })
   },
 
   resetPassword: async (req, res, next) => {
 
-    const { password } = req.body;
+    const { password, email } = req.body;
 
-    if(!password) return res.status(400).json({
+    if(!password && !email) return res.status(400).json({
       status: 'fail',
-      message: 'New Password is not provided'
+      message: 'New Password or Email is not provided'
     });
 
-    const user = await User.findById(req.user._id)
+    const user = await User.findOne({"local.email":email})
 
     if(!user) return res.status(400).json({
       status: 'fail',
@@ -293,7 +306,7 @@ just ignore this email.Otherwise, you can reset your password using the followin
     user.resetPassword(password);
 
     await user.save();
-    const token = signToken(req.user);
+    const token = signToken(user);
 
     res.status(200).json({
     status: 'successful',

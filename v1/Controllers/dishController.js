@@ -203,7 +203,7 @@ exports.toggle_favorite = async (req, res) => {
     if (!dish) {
       throw new Error('Not found')
     }
-    const me = await Profile.findOne({
+     const me = await Profile.findOne({
       userId: req.user._id
     })
     const isFavorite = me.favourites && me.favourites.includes(dishId)
