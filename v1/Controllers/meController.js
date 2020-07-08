@@ -13,7 +13,7 @@ exports.singleUpload = upload.single("photo");
 exports.get_me = async (req, res) => {
   try {
     const userId = req.user._id.toString();
-    const me = await Profile.findOne({ user: userId })
+    const me = await Profile.findOne({ userId })
       .select(["-favourites", "-followers", "-following"])
       .populate("dishes");
 
