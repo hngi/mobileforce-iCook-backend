@@ -4,6 +4,7 @@ const Profile = require('../../Models/profileModel')
 const User = require('../../Models/authModel')
 const Comment = require('../../Models/commentModel')
 const PublicResponse = require('../../Helpers/model')
+const { findByIdAndRemove } = require('../../Models/commentModel')
 
 exports.createDish = async (req, res, next) => {
   try {
@@ -240,7 +241,7 @@ exports.toggle_favorite = async (req, res) => {
   }
 }
 
-// /api/v1/dish/comment/:dishId
+// POST /api/v1/dish/comment/:dishId
 exports.addCommentToDish = async (req, res, next) => {
   // console.log(req.user)
   try {
@@ -277,15 +278,24 @@ exports.addCommentToDish = async (req, res, next) => {
   }
 }
 
-// /api/v1/dish/comments/:dishId/:commentId
+// get comments for particular dish
+// GET /api/v1/dishes/comments/dishId
+exports.getDishComment = (req, res, next) => {
+  try {
+      const comment
+  } catch (err) {
+    
+  }
+}
+
+// DELETE /api/v1/dish/comments/:dishId/:commentId
 exports.removeDishComment = async (req, res, next) => {
   try {
     const dish = await Dish.findById(req.params.dishId)
 
-    // Pull out comment
-    const comment = dish.comments.find((comment) => comment.id === req.params.commentId)
+    const comment = await Comment.findById(req.params.commentId)
 
-    if (!comment) {
+    if (!dish || !comment) {
       throw new Error('Not Found')
     }
 
@@ -294,15 +304,11 @@ exports.removeDishComment = async (req, res, next) => {
       throw new Error('User nor authorized')
     }
 
-    const removeIndex = dish.comments.map((comment) => comment.user.toString()).indexOf(req.user.id)
-
-    dish.comments.splice(removeIndex, 1)
-
-    await dish.save()
+    await Comment.findByIdAndRemove(req.params.commentId)
 
     res.status(200).json({
       status: 'success',
-      data: dish.comments,
+      message: 'Commment deleted',
       error: ''
     })
   } catch (err) {
