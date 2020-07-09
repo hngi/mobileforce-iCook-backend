@@ -13,9 +13,9 @@ const dishSchema = new schema(
         ref: 'profile'
       }
     ],
-    dishImages: {
-      type: [String]
-    },
+    dishImages: [{
+      type: String
+    }],
     recipe: {
       type: [String]
     },

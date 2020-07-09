@@ -7,7 +7,7 @@ const upload = require('../../Database/uploadImage')
 const Profile = require('../../Models/profileModel')
 const PublicResponse = require('../../Helpers/model')
 
-exports.singleUpload = upload.single('photo')
+exports.singleUpload = upload.single('photo') 
 
 // @Usman Jun 28
 exports.get_me = async (req, res) => {
@@ -179,7 +179,7 @@ exports.get_favourites = async (req, res) => {
   }
 }
 
-exports.get_settings = async (req, res, next) => {}
+exports.get_settings = async (req, res, next) => { }
 
 exports.update_profile = async (req, res) => {
   const { name, email, gender, phone } = req.body
@@ -214,11 +214,11 @@ exports.update_profile = async (req, res) => {
   }
 }
 
-exports.update_settings = async (req, res) => {}
+exports.update_settings = async (req, res) => { }
 
-exports.unlink_google = async (req, res) => {}
+exports.unlink_google = async (req, res) => { }
 
-exports.unlink_facebook = async (req, res) => {}
+exports.unlink_facebook = async (req, res) => { }
 
 exports.delete_account = async (req, res) => {
   const user = await User.findById(req.user.id)
@@ -230,22 +230,29 @@ exports.delete_account = async (req, res) => {
 exports.upload_photo = async (req, res) => {
   const fieldsToUpdate = {}
 
-  if (req.file) fieldsToUpdate.userImage = req.file.location
+  if (!req.file) res.status(400).json({
+    status: 'fail',
+    error: 'No image found'
+  })
+
+  fieldsToUpdate.userImage = req.file.location
 
   try {
     let userProfile = await Profile.findOne({ userId: req.user._id })
 
-    if (!userProfile) {
-      throw new Error('Profile not found')
-    }
+    if (!userProfile) throw new Error('Profile not found')
 
     userProfile = await Profile.findOneAndUpdate(
       { userId: req.user._id },
       { $set: fieldsToUpdate },
-      {
-        new: true
-      }
+      { new: true }
     )
+
+    if (!userProfile) res.status(404).json({
+      status: 'fail',
+      error: 'User not found'
+    })
+
     res.status(200).json({
       status: 'success',
       message: 'Image uploaded successfully',
@@ -253,10 +260,11 @@ exports.upload_photo = async (req, res) => {
         URL: req.file.location
       }
     })
+
   } catch (err) {
     res.status(500).json({
       status: 'fail',
-      error: 'Image upload unsuccessful! Try again later'
+      error: err.message
     })
   }
 }
