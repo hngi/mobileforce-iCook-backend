@@ -4,7 +4,6 @@ const Profile = require("../../Models/profileModel");
 const User = require("../../Models/authModel");
 const Comment = require("../../Models/commentModel");
 const PublicResponse = require("../../Helpers/model");
-const { findByIdAndRemove } = require("../../Models/commentModel");
 
 exports.createDish = async (req, res, next) => {
   if (!req.files) res.status(400).json({
@@ -36,10 +35,6 @@ exports.createDish = async (req, res, next) => {
       chefId: profileId,
       dishImages
     });
-
-    // const findProfile = await User.findById(userId).populate('profile')
-
-    // const profileId = findProfile.profile[0]._id
 
     await dish.save();
 
