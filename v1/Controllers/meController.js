@@ -221,10 +221,38 @@ exports.unlink_google = async (req, res) => {}
 exports.unlink_facebook = async (req, res) => {}
 
 exports.delete_account = async (req, res) => {
+  let id = req.user.id
   const user = await User.findById(req.user.id)
-  const userProfile = await findOne({ userId: req.user.id })
-
+  const userProfile = await Profile.findOne({ userId: req.user.id })
   const dishes = await Dish.findOne({ chefId: userProfile.id })
+  if(user && dishes && userProfile){
+    let isUser = await User.findOneAndRemove({userId:req.user.id})  
+    let isDis = await Dish.findOneAndRemove({chefId:req.user.id})  
+    let isPro = await Profile.findOneAndRemove({userId:req.user.id}) 
+    if(isUser &&isDis && isPro){
+      res.status(200).json({
+        status: 'success',
+        message: 'user account deletd successfully'
+       
+      })
+    }else{
+      res.status(400).json({
+        status:'fail',
+        message:'account was not deleted '
+  
+      })
+    }
+
+  }else{
+    res.status(400).json({
+      status:'fail',
+      message:'error ocuur'
+      
+
+    }) 
+  }
+   
+
 }
 
 exports.upload_photo = async (req, res) => {
