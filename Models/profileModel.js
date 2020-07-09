@@ -1,7 +1,12 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const schema = mongoose.Schema;
+const { ObjectId } = mongoose.Schema.Types;
 
 const profileSchema = new schema({
+  userId: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user'
+  }],
   name: {
     type: String,
     trim: true,
@@ -11,32 +16,34 @@ const profileSchema = new schema({
     unique: true,
     trim: true,
   },
-  userImage: String,
-  country: String,
-  phoneNumber: String,
-  dishes: [{
-    type: schema.Types.ObjectId,
-    ref: "Profile"
-  }], //array of dishes posted by this user
-  favourites: [{
-    type: schema.Types.ObjectId,
-    ref: "Dish"
-  }], //array of dish IDs
-  followers: [
-    {
-      name: String,
-      id: schema.Types.ObjectId,
-    },
-  ],
-  following: [
-    {
-      name: String,
-      id: schema.Types.ObjectId,
-    },
-  ],
-});
+  gender: {
+    type: String,
+    default: '',
+    enum: ['male', 'female', 'others'],
+  },
+  userImage: {
+    type: String,
+    default: 'https://icook-images.s3.us-east-2.amazonaws.com/user-5efa6f6b9e25253484f82ab2-1593520284454.jpeg'
+  },
+  country: {
+    type: String,
+  },
+  phoneNumber: {
+    type: String,
+  },
+  bio: {
+    type: String,
+  },
+  dishes: [{ type: ObjectId, ref: 'dish' }],
+  favourites: [{ type: ObjectId, ref: 'dish' }],
+  followers: [{ type: ObjectId, ref: 'Profile' }],
+  following: [{ type: ObjectId, ref: 'Profile' }],
+}, { timestamps: true });
 
-const Profile = mongoose.model("Profile", profileSchema);
+profileSchema.methods._isFollowing = function (userId) {
+  return this.followers.includes(userId);
+}
 
+const Profile = mongoose.model('profile', profileSchema);
 
 module.exports = Profile;

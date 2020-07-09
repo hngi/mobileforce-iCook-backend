@@ -1,14 +1,30 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 const dish_controller = require('../Controllers/dishController')
 
+const passport = require('passport')
+const passportJWT = passport.authenticate('jwt', { session: false })
 
-router.get('/', dish_controller.get_all_dishes)
+router.post('/', passportJWT, dish_controller.createDish)
 
-router.get('/:id', dish_controller.get_dishes_by_ID)
+router.get('/', passportJWT, dish_controller.get_all_dishes)
 
+// router.get('/me', passportJWT, dish_controller.get_user_dishes);
 
+router.get('/:id', passportJWT, dish_controller.get_dishes_by_ID)
 
+router.delete('/:id', passportJWT, dish_controller.delete_dish)
 
+router.patch('/:id', passportJWT, dish_controller.edit_dish)
 
-module.exports = router;
+router.put('/toggle_like/:id', passportJWT, dish_controller.toggle_like)
+
+router.put('/toggle_favourite/:id', passportJWT, dish_controller.toggle_favorite)
+
+router.get('/comments/:dishId', passportJWT, dish_controller.getDishComment)
+
+router.post('/comments/:dishId', passportJWT, dish_controller.addCommentToDish)
+
+router.delete('/comments/:commentId', passportJWT, dish_controller.removeDishComment)
+
+module.exports = router
