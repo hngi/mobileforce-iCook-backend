@@ -19,6 +19,11 @@ const userSchema = new Schema({
     password: {
       type: String,
     },
+    isVerify: {
+      type: Number,
+      default:0,
+      enum:[ 0,1]
+    },
     passwordResetToken: String,
     passwordResetExpires: Date
   },

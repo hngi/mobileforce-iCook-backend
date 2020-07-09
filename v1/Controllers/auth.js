@@ -4,7 +4,7 @@ const Profile = require('../../Models/profileModel');
 const User = require('../../Models/authModel');
 const { sendEmail } = require('./../../Helpers/email');
 
-signToken = (user) => {
+let signToken = (user) => {
   return JWT.sign(
     {
       iss: 'CodeWorkr',
@@ -55,21 +55,27 @@ module.exports = {
         gender: gender,
       });
 
+  try {
+    const token = signToken(newUser);
+
+    const text = 'You are receiving this because you (or someone else)sign up with your email.\n\n' +
+      'Please click on the following link, or paste this into your browser to verify your acct:\n\n' +
+      'http://' + req.headers.host + '/api/v1/authenticate/' +token  + '\n\n' +
+      'If you did not request this, please ignore this message.\n';
+   let data;
+  const subject = 'Your password reset token (valid for 10 min)';
+     await sendEmail(newUser.local.email, { subject, text });
+    
       await profile.save();
       await newUser.profile.push(profile);
       await newUser.save();
-      // await profile.userId.push(newUser._id);
-
-      // Generate the token
-      const token = signToken(newUser);
-      // Respond with token
-      return res
+     res
         .status(201)
         .header('x-auth-token', token)
         .json({
           status: 'success',
           error: '',
-          message: 'user successfully registered!',
+          message: 'an email was sent to your email please follow the link to verify your acct!',
           data: {
             token: token,
             userID: newUser._id,
@@ -80,6 +86,14 @@ module.exports = {
             token,
           },
         });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      status: 'fail',
+      message: 'There was an error sending the email. Try again later'
+    })
+  }
+    
     } catch (error) {
       return res.status(400).json({ status: 'fail', error: error.message });
     }
@@ -88,12 +102,20 @@ module.exports = {
   signIn: async (req, res, next) => {
     // Generate token
     try {
+//       const dd = await User.findById(req.user._id)
+// console.log(dd.local.isVerify)
+      const isVerify = await User.findById(req.user._id)
 
+      if(isVerify.local.isVerify===0) {return res.status(400).json({
+        status: 'fail',
+        message: 'you are not a verified user please check your mail to verify or resend a verification link'
+      })} else {
+        
       const token = signToken(req.user);
       
       const userDetails = await User.findById(req.user._id).populate('profile');
      
-      console.log(userDetails);
+      console.log(userDetails,'s');
 
       res
         .header('x-auth-token', token)
@@ -109,6 +131,8 @@ module.exports = {
             token,
           },
         });
+      }
+      
     } catch (error) {
       return res.status(400).json({
         status: 'fail',
@@ -379,48 +403,4 @@ just ignore this email.Otherwise, you can reset your password using the followin
 
 
 
-
-
-
-resendActivationLink: async (req, res, next) => {
-    const {email} = req.body;
-
-    if (!email) {
-      return res.status(400).json({
-        status: "fail",
-        message: 'Email not provided'
-      })
-      }
-
-    // 1) Get user based on POSTed email
-  const user = await User.findOne({"local.email":email});
-  //console.log("User",user)
-  if (!user) {
-    return res.status(400).json({
-      status: "fail",
-      message: "User has not been register exist"
-    })
-  }
-  // 2) Generate the rendom activationlink token
-  const resendActivationLink = user.createPasswordResetToken();
-  const text = 'You are receiving this because you (or someone else) have requested for the resend an activation link to verify your email.\n\n' +
-  'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-  'http://' + req.headers.host + '/' + resendActivationLink + '\n\n' +
-  'If you did not request this, please ignore this message.\n'
-
-  const subject = 'Your activation link (valid for 10 min)';
-  try {
-    await sendEmail(user.local.email, { subject, text });
-    res.status(200).json({
-      status: 'success',
-      message: 'ActivationLink sent Successfully!',
-    });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      status: 'fail',
-      message: 'There was an error sending the email. Try agaim later'
-    })
-  }
-  }
 }

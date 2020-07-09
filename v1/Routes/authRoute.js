@@ -31,7 +31,6 @@ router.route("/confirmToken").put(UsersController.confirmToken);
 router.route("/resetPassword/").put(UsersController.resetPassword);
 
 
-router.route("/resend-activation/").post(UsersController.resendActivationLink);
 
 router.route("/unlink/google")
   .patch(passportJWT, UsersController.unlink_google_account);
