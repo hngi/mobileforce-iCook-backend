@@ -140,7 +140,7 @@ exports.get_favourites = async (req, res) => {
       _id: {
         $in: me.favourites.map((id) => mongoose.Types.ObjectId(id.toString()))
       }
-    })
+    }).populate({path: 'chefId', select: ['name', 'userImage']})
     favourites = PublicResponse.dishes(favourites, req)
     let paginated = []
     let foundIndex = 0
