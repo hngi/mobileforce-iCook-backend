@@ -7,7 +7,7 @@ const upload = require('../../Database/uploadImage')
 const Profile = require('../../Models/profileModel')
 const PublicResponse = require('../../Helpers/model')
 
-exports.singleUpload = upload.single('photo')
+exports.singleUpload = upload.single('photo') 
 
 // @Usman Jun 28
 exports.get_me = async (req, res) => {

@@ -7,6 +7,13 @@ const PublicResponse = require("../../Helpers/model");
 const { findByIdAndRemove } = require("../../Models/commentModel");
 
 exports.createDish = async (req, res, next) => {
+  if (!req.files) res.status(400).json({
+    status: 'fail',
+    error: 'No image found'
+  })
+
+  const dishImages = req.files.map(file => file.location)
+
   try {
     const { name, recipe, healthBenefits, ingredients } = req.body;
 
@@ -14,26 +21,34 @@ exports.createDish = async (req, res, next) => {
 
     const findProfile = await User.findById(userId).populate("profile");
 
+    if (!findProfile) res.status(404).json({
+      status: 'fail',
+      error: 'User not found'
+    })
+
     const profileId = findProfile.profile[0]._id;
 
     const dish = new Dish({
-      name: name,
-      recipe: recipe,
-      healthBenefits: healthBenefits,
-      ingredients: ingredients,
+      name,
+      recipe,
+      healthBenefits,
+      ingredients,
       chefId: profileId,
+      dishImages
     });
 
     // const findProfile = await User.findById(userId).populate('profile')
 
     // const profileId = findProfile.profile[0]._id
 
+    await dish.save();
+
     await Profile.findByIdAndUpdate(
       profileId,
       { $push: { dishes: dish } },
       { new: true, useFindAndModify: false }
     );
-    await dish.save();
+
     return res.status(201).json({
       status: "success",
       error: "",
