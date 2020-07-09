@@ -221,15 +221,17 @@ exports.unlink_google = async (req, res) => {}
 exports.unlink_facebook = async (req, res) => {}
 
 exports.delete_account = async (req, res) => {
-  let id = req.user.id
+  let id =' req.user.id'
   const user = await User.findById(req.user.id)
   const userProfile = await Profile.findOne({ userId: req.user.id })
-  const dishes = await Dish.findOne({ chefId: userProfile.id })
-  if(user && dishes && userProfile){
-    let isUser = await User.findOneAndRemove({userId:req.user.id})  
-    let isDis = await Dish.findOneAndRemove({chefId:req.user.id})  
+  // const dishes = await Dish.findOne({ chefId: userProfile.id })
+
+  console.log(user.profile[0] , userProfile._id)
+  if(user  && userProfile){
+    let isUser = await User.findOneAndRemove({profile:user.profile[0]})  
+    // let isDis = await Dish.findOneAndRemove({chefId:req.user.id})  
     let isPro = await Profile.findOneAndRemove({userId:req.user.id}) 
-    if(isUser &&isDis && isPro){
+    if(isUser  && isPro){
       res.status(200).json({
         status: 'success',
         message: 'user account deletd successfully'
