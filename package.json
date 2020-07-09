@@ -5,13 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-<<<<<<< HEAD
-    "dev": "nodemon app.js",
-    "start": "node app.js"
-=======
     "dev": "nodemon -r dotenv/config app.js dotenv_config_path=./.env.development",
     "start": "node -r dotenv/config app.js"
->>>>>>> 66f3a7d676e5132de47fa68251e69ca152dd8d0b
   },
   "repository": {
     "type": "git",
