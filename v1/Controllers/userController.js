@@ -23,7 +23,7 @@ exports.get_all_users = async (req, res, next) => {
     });
   }
 };
-//Get a User profile @omodauda
+//View a User profile and his dishes @omodauda
 exports.get_user_by_id = async (req, res, next) => {
   try {
     const me = await Profile.findOne({
