@@ -131,7 +131,7 @@ exports.get_auth = async (req, res) => {
   }
 }
 
-// @Usman Jun 28
+//Get my favourite dishes
 exports.get_favourites = async (req, res) => {
   const { size = 15, after } = req.query
   try {
