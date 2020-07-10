@@ -7,18 +7,17 @@ const upload = require('../../Database/uploadImage')
 const Profile = require('../../Models/profileModel')
 const PublicResponse = require('../../Helpers/model')
 
-exports.singleUpload = upload.single('photo') 
+exports.singleUpload = upload.single('photo')
 
 exports.multipleUpload = upload.array('photo', 5)
 
 // @Usman Jun 28
 exports.get_me = async (req, res) => {
   try {
-
-    const userId = req.user._id.toString();
+    const userId = req.user._id.toString()
     const me = await Profile.findOne({ userId })
-      .select(["-favourites", "-followers", "-following"])
-      .populate("dishes");
+      .select(['-favourites', '-followers', '-following'])
+      .populate('dishes')
 
     if (me) {
       res.status(200).json({
@@ -70,6 +69,7 @@ exports.get_user_dishes = async (req, res, next) => {
         }
       ]
     })
+    // get favorites for a user
     const isFavourite = (id) => ({ isFavourite: me.favourites.includes(id) })
     const dishes = PublicResponse.dishes(_dishes, req, isFavourite)
     let foundIndex = 0
@@ -141,7 +141,7 @@ exports.get_favourites = async (req, res) => {
       _id: {
         $in: me.favourites.map((id) => mongoose.Types.ObjectId(id.toString()))
       }
-    }).populate({path: 'chefId', select: ['name', 'userImage']})
+    }).populate({ path: 'chefId', select: ['name', 'userImage'] })
     favourites = PublicResponse.dishes(favourites, req)
     let paginated = []
     let foundIndex = 0
@@ -180,7 +180,7 @@ exports.get_favourites = async (req, res) => {
   }
 }
 
-exports.get_settings = async (req, res, next) => { }
+exports.get_settings = async (req, res, next) => {}
 
 exports.update_profile = async (req, res) => {
   const { name, email, gender, phone } = req.body
@@ -215,11 +215,11 @@ exports.update_profile = async (req, res) => {
   }
 }
 
-exports.update_settings = async (req, res) => { }
+exports.update_settings = async (req, res) => {}
 
-exports.unlink_google = async (req, res) => { }
+exports.unlink_google = async (req, res) => {}
 
-exports.unlink_facebook = async (req, res) => { }
+exports.unlink_facebook = async (req, res) => {}
 
 exports.delete_account = async (req, res) => {
   const user = await User.findById(req.user.id)
@@ -231,10 +231,11 @@ exports.delete_account = async (req, res) => {
 exports.upload_photo = async (req, res) => {
   const fieldsToUpdate = {}
 
-  if (!req.file) res.status(400).json({
-    status: 'fail',
-    error: 'No image found'
-  })
+  if (!req.file)
+    res.status(400).json({
+      status: 'fail',
+      error: 'No image found'
+    })
 
   fieldsToUpdate.userImage = req.file.location
 
@@ -249,10 +250,11 @@ exports.upload_photo = async (req, res) => {
       { new: true }
     )
 
-    if (!userProfile) res.status(404).json({
-      status: 'fail',
-      error: 'User not found'
-    })
+    if (!userProfile)
+      res.status(404).json({
+        status: 'fail',
+        error: 'User not found'
+      })
 
     res.status(200).json({
       status: 'success',
@@ -261,9 +263,8 @@ exports.upload_photo = async (req, res) => {
         URL: req.file.location
       }
     })
-
   } catch (err) {
-    console.log(err);
+    console.log(err)
     res.status(500).json({
       status: 'fail',
       error: err.message
