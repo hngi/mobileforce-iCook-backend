@@ -23,8 +23,6 @@ passport.use(
         if (!user) {
           return done(null, false);
         }
-        // console.log(user);
-        // req.user = user;
 
         // Otherwise, return the user
         done(null, user);
