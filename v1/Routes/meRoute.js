@@ -35,6 +35,8 @@ router.delete('/unlink_facebook', passportJWT, me_controller.unlink_facebook)
 // upload photo
 router.put('/upload_photo', passportJWT, me_controller.singleUpload,me_controller.upload_photo)
 
+router.put('/upload_photos',me_controller.multipleUpload,me_controller.upload_photos)
+
 // delete my account
 router.delete('/delete_account', passportJWT, me_controller.delete_account)
 

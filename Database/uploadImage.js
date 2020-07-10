@@ -16,9 +16,10 @@ const upload = multer({
       bucket: 'icook-images',
       acl: 'public-read',
       metadata: function (req, file, cb) {
-        cb(null, {fieldName: 'TESTING'});
+        cb(null, {fieldName: 'Profile Picture'});
       },
       key: function (req, file, cb) {
+        
         cb(null, `user-${req.user._id}-${Date.now()}.jpeg`)
       }
     }),

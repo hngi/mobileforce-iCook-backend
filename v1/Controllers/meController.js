@@ -9,6 +9,8 @@ const PublicResponse = require('../../Helpers/model')
 
 exports.singleUpload = upload.single('photo')
 
+exports.multipleUpload = upload.array('photo', 5)
+
 // @Usman Jun 28
 exports.get_me = async (req, res) => {
   try {
@@ -85,7 +87,6 @@ exports.get_user_dishes = async (req, res, next) => {
 
     return res.status(200).json({
       status: 'success',
-      error: '',
       results: dishes.length,
       data: {
         total: dishes.length,
@@ -256,4 +257,13 @@ exports.upload_photo = async (req, res) => {
       error: 'Image upload unsuccessful! Try again later'
     })
   }
+}
+
+exports.upload_photos = async (req, res) => {
+  if (req.file) console.log("Image uploaded successfully");
+
+  res.status(200).json({
+    status: "successful",
+    message: "Good to go"
+  })
 }
