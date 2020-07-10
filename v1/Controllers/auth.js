@@ -94,6 +94,7 @@ module.exports = {
       const userDetails = await User.findById(req.user._id).populate('profile');
      
       console.log(userDetails);
+      
 
       res
         .header('x-auth-token', token)
@@ -103,6 +104,7 @@ module.exports = {
           error: '',
           data: {
             user_id: req.user._id,
+            profileId: userDetails.profile[0]._id,
             user_name: userDetails.profile[0].name,
             email: userDetails.profile[0].email,
             profileImage: userDetails.profile[0].userImage,
