@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
-const auth = require('../v1/Controllers/auth');
 
+//credentials for gmail
 const email = process.env.EMAIL;
 const password = process.env.PASSWORD;
 
@@ -11,6 +11,7 @@ exports.sendEmail = async (recipient, message) => {
     subject: message.subject,
     text: message.text
   };
+  //configuring nodemailer transport service using gmail
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {

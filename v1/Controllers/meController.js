@@ -269,12 +269,3 @@ exports.upload_photo = async (req, res) => {
     })
   }
 }
-
-exports.upload_photos = async (req, res) => {
-  if (req.file) console.log("Image uploaded successfully");
-
-  res.status(200).json({
-    status: "successful",
-    message: "Good to go"
-  })
-}
