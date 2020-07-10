@@ -7,13 +7,15 @@ const dishSchema = new schema(
       type: String,
       required: true
     },
-    chefId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'profile'
-    },
-    dishImages: {
-      type: [String]
-    },
+    chefId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'profile'
+      }
+    ],
+    dishImages: [{
+      type: String
+    }],
     recipe: {
       type: [String]
     },
@@ -27,26 +29,7 @@ const dishSchema = new schema(
     },
     healthBenefits: {
       type: [String]
-    },
-    comments: [
-      {
-        user: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'users'
-        },
-        text: {
-          type: String,
-          required: true
-        },
-        name: {
-          type: String
-        },
-        date: {
-          type: Date,
-          default: Date.now
-        }
-      }
-    ]
+    }
   },
   { timestamps: true }
 )

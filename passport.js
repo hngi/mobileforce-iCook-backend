@@ -23,8 +23,6 @@ passport.use(
         if (!user) {
           return done(null, false);
         }
-        // console.log(user);
-        // req.user = user;
 
         // Otherwise, return the user
         done(null, user);
@@ -143,7 +141,7 @@ passport.use(
 
         // If not, handle it
         if (!isMatch) {
-          return done(new Error('Authentication failed'), false);
+          return done(new Error('Invalid password'), false);
         }
 
         done(null, user);

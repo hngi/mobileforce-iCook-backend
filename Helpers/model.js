@@ -15,27 +15,26 @@ function _dish(dish, req, extraData={}) {
 
 
 // @Usman Jun 27
-function _user(user, req) {
+function _user(user, req, fn) {
   const userId = user._id.toString(); 
   const me = user.userId.includes(req.user._id.toString());
   const _user = Object.assign({}, {
     ...user.toJSON(),
+    dishes: dishes(user.dishes, req, fn),
     followersCount: user.followers ? user.followers.length : 0,
     followingCount: user.following ? user.following.length : 0,
     dishesCount: user.dishes ? user.dishes.length : 0,
     isFollowing: user._isFollowing(userId),
     me
   });
-  delete _user.followers;
-  delete _user.following;
-  delete _user.dishes;
   delete _user.favDishes;
   delete _user.favourites;
   return _user;
 };
 
 // @Usman Jun 27
+const dishes = (_dishes, req, fn=() => ({})) => _dishes.map(d => _dish(d, req, fn(d._id.toString())));
 exports.users = (_users, req) => _users.map(u => _user(u, req));
-exports.dishes = (_dishes, req, fn=() => ({})) => _dishes.map(d => _dish(d, req, fn(d._id.toString())));
+exports.dishes = dishes;
 exports.dish = _dish;
 exports.user = _user;

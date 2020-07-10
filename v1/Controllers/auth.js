@@ -91,8 +91,10 @@ module.exports = {
 
       const token = signToken(req.user);
       
-      userDetails = await User.findById(req.user._id).populate('profile');
-    
+      const userDetails = await User.findById(req.user._id).populate('profile');
+     
+      console.log(userDetails);
+
       res
         .header('x-auth-token', token)
         .status(200)
@@ -277,8 +279,6 @@ just ignore this email.Otherwise, you can reset your password using the followin
         message: 'Token is invalid or has expired'
       })
       }
-      console.log(user._id);
-      
       await User.findOneAndUpdate({_id:user._id},
         {
           "local.passwordResetToken": null,
@@ -291,7 +291,6 @@ just ignore this email.Otherwise, you can reset your password using the followin
   },
 
   resetPassword: async (req, res, next) => {
-
     const { password, email } = req.body;
 
     if(!password && !email) return res.status(400).json({
