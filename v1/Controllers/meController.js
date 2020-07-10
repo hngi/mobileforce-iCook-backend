@@ -262,6 +262,7 @@ exports.upload_photo = async (req, res) => {
     })
 
   } catch (err) {
+    console.log(err);
     res.status(500).json({
       status: 'fail',
       error: err.message
