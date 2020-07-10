@@ -30,7 +30,7 @@ const fileFilter = (req, file, cb) => {
   if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
     cb(null, true)
   } else {
-    cb(new CustomError("Invalid file type, file should be either png or jpeg", 400), false)
+    cb(new Error("Invalid file type, file should be either png or jpeg"), false)
   }
 }
 
