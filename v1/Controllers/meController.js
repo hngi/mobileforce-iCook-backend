@@ -219,7 +219,7 @@ exports.update_settings = async (req, res) => {}
 
 exports.unlink_google = async (req, res) => {}
 
-exports.unlink_facebook = async (req, res) => {}
+exports.unlink_facebook = async (req, res) => { }
 
 exports.delete_account = async (req, res) => {
   const user = await User.findById(req.user.id)
