@@ -100,7 +100,7 @@ module.exports = {
   },
 
   signIn: async (req, res, next) => {
-    // Generate token
+    let userDetails;
     try {
 //       const dd = await User.findById(req.user._id)
 // console.log(dd.local.isVerify)
@@ -115,7 +115,9 @@ module.exports = {
       
       const userDetails = await User.findById(req.user._id).populate('profile');
      
-      console.log(userDetails,'s');
+
+      console.log(userDetails);
+      
 
       res
         .header('x-auth-token', token)
@@ -125,6 +127,7 @@ module.exports = {
           error: '',
           data: {
             user_id: req.user._id,
+            profileId: userDetails.profile[0]._id,
             user_name: userDetails.profile[0].name,
             email: userDetails.profile[0].email,
             profileImage: userDetails.profile[0].userImage,
@@ -141,7 +144,7 @@ module.exports = {
     }
   },
 
-  updateUserPassword: async (req, res, next) => {
+  updateUserPassword: async (req, res, next)=> {
     try {
 
       if(!req.body.currentPassword || !req.body.newPassword){
@@ -229,9 +232,11 @@ module.exports = {
     }
   },
 
+  //generates a reset token and sends to user
   forgotPassword: async (req, res, next) => {
     const {email} = req.body;
 
+    //validating user credentials
     if (!email) {
       return res.status(400).json({
         status: "fail",
@@ -239,18 +244,19 @@ module.exports = {
       })
       }
 
-    // 1) Get user based on POSTed email
+    // 1) Get user based on provided email
   const user = await User.findOne({"local.email":email});
-  //console.log("User",user)
+ 
   if (!user) {
     return res.status(400).json({
       status: "fail",
       message: "User doesn't exist"
     })
   }
-  // 2) Generate the rendom reset token
+  // 2) Generate the rendom reset token and expiry data
   const result = user.createPasswordResetToken();
 
+  //storing generated reset token and expiry data as properties to the associated user
   await User.findByIdAndUpdate(user._id, { "local.passwordResetToken": result.resetToken,
     "local.passwordResetExpires":result.resetExpires},function(err, result) {
       if (err) {
@@ -261,18 +267,20 @@ module.exports = {
       }
     })
  
-  const text = `We've received a request to reset your password. If you didn't make the request,
+  //Mail body to be sent to the user
+  const mailBody = `We've received a request to reset your password. If you didn't make the request,
 just ignore this email.Otherwise, you can reset your password using the following token:\n ${result.resetToken}`;
 
-  const subject = 'Your password reset token (valid for 10 min)';
+  //Mail Subject
+  const mailSubject = 'Your password reset token (valid for 10 min)';
   try {
-    await sendEmail(user.local.email, { subject, text });
+    //sending mail to user
+    await sendEmail(user.local.email, { mailSubject, mailBody });
     res.status(200).json({
       status: 'success',
       message: 'Token sent Successfully!',
     });
   } catch (err) {
-    console.log(err);
     return res.status(500).json({
       status: 'fail',
       message: 'There was an error sending the email. Try agaim later'

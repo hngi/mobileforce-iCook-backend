@@ -23,15 +23,26 @@ exports.get_all_users = async (req, res, next) => {
     })
   }
 }
-//Get a User profile @omodauda
+//View a User profile and his dishes @omodauda
 exports.get_user_by_id = async (req, res, next) => {
   try {
+    const me = await Profile.findOne({
+      userId: req.user._id
+    })
+    const isFavorite = (id) => ({
+      isFavourite: me.favourites && me.favourites.includes(id)
+    })
     const userId = req.params.id
-    const user = await Profile.findOne({ userId })
-      .select(['-email', '-favourites'])
-      .populate('dishes')
-    const _user = PublicResponse.user(user, req)
-
+    const user = await Profile.findOne({ _id: userId })
+      .populate({
+        path: 'dishes',
+        populate: {
+          path: 'chefId',
+          select: ['name', 'userImage']
+        }
+      })
+      .select('-favourites')
+    const _user = PublicResponse.user(user, req, isFavorite)
     if (user) {
       res.status(200).json({
         status: 'success',
@@ -109,11 +120,12 @@ exports.followUser = async (req, res, next) => {
     const followId = req.params.id.toString()
     const id = req.user._id.toString()
 
-    if (id === followId) {
+    const userProfile = await Profile.findOne({ userId: id })
+
+    if (userProfile.id === followId) {
       throw new Error('You cant follow your self')
     }
 
-    const userProfile = await Profile.findOne({ userId: id })
     const profileId = userProfile._id
     const following = userProfile.following
 
@@ -159,11 +171,12 @@ exports.unfollowUser = async (req, res, next) => {
     const unfollowId = req.params.id.toString()
     const id = req.user._id.toString()
 
-    if (id === unfollowId) {
+    const userProfile = await Profile.findOne({ userId: id })
+
+    if (userProfile.id === unfollowId) {
       throw new Error('You cant unfollow your self')
     }
 
-    const userProfile = await Profile.findOne({ userId: id })
     const profileId = userProfile._id
     const following = userProfile.following
 

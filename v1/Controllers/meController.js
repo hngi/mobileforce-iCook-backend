@@ -9,14 +9,15 @@ const PublicResponse = require('../../Helpers/model')
 
 exports.singleUpload = upload.single('photo')
 
+exports.multipleUpload = upload.array('photo', 5)
+
 // @Usman Jun 28
 exports.get_me = async (req, res) => {
   try {
-
-    const userId = req.user._id.toString();
+    const userId = req.user._id.toString()
     const me = await Profile.findOne({ userId })
-      .select(["-favourites", "-followers", "-following"])
-      .populate("dishes");
+      .select(['-favourites', '-followers', '-following'])
+      .populate('dishes')
 
     if (me) {
       res.status(200).json({
@@ -68,6 +69,7 @@ exports.get_user_dishes = async (req, res, next) => {
         }
       ]
     })
+    // get favorites for a user
     const isFavourite = (id) => ({ isFavourite: me.favourites.includes(id) })
     const dishes = PublicResponse.dishes(_dishes, req, isFavourite)
     let foundIndex = 0
@@ -88,7 +90,6 @@ exports.get_user_dishes = async (req, res, next) => {
 
     return res.status(200).json({
       status: 'success',
-      error: '',
       results: dishes.length,
       data: {
         total: dishes.length,
@@ -130,7 +131,7 @@ exports.get_auth = async (req, res) => {
   }
 }
 
-// @Usman Jun 28
+//Get my favourite dishes
 exports.get_favourites = async (req, res) => {
   const { size = 15, after } = req.query
   try {
@@ -140,7 +141,7 @@ exports.get_favourites = async (req, res) => {
       _id: {
         $in: me.favourites.map((id) => mongoose.Types.ObjectId(id.toString()))
       }
-    })
+    }).populate({ path: 'chefId', select: ['name', 'userImage'] })
     favourites = PublicResponse.dishes(favourites, req)
     let paginated = []
     let foundIndex = 0
@@ -260,22 +261,31 @@ exports.delete_account = async (req, res) => {
 exports.upload_photo = async (req, res) => {
   const fieldsToUpdate = {}
 
-  if (req.file) fieldsToUpdate.userImage = req.file.location
+  if (!req.file)
+    res.status(400).json({
+      status: 'fail',
+      error: 'No image found'
+    })
+
+  fieldsToUpdate.userImage = req.file.location
 
   try {
     let userProfile = await Profile.findOne({ userId: req.user._id })
 
-    if (!userProfile) {
-      throw new Error('Profile not found')
-    }
+    if (!userProfile) throw new Error('Profile not found')
 
     userProfile = await Profile.findOneAndUpdate(
       { userId: req.user._id },
       { $set: fieldsToUpdate },
-      {
-        new: true
-      }
+      { new: true }
     )
+
+    if (!userProfile)
+      res.status(404).json({
+        status: 'fail',
+        error: 'User not found'
+      })
+
     res.status(200).json({
       status: 'success',
       message: 'Image uploaded successfully',
@@ -284,9 +294,10 @@ exports.upload_photo = async (req, res) => {
       }
     })
   } catch (err) {
+    console.log(err)
     res.status(500).json({
       status: 'fail',
-      error: 'Image upload unsuccessful! Try again later'
+      error: err.message
     })
   }
 }

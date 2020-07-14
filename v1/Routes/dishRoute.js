@@ -1,11 +1,12 @@
 const express = require('express')
 const router = express.Router()
 const dish_controller = require('../Controllers/dishController')
+const upload = require('../../Database/uploadImage')
 
 const passport = require('passport')
 const passportJWT = passport.authenticate('jwt', { session: false })
 
-router.post('/', passportJWT, dish_controller.createDish)
+router.post('/', passportJWT, upload.array("photos"), dish_controller.createDish)
 
 router.get('/', passportJWT, dish_controller.get_all_dishes)
 
