@@ -223,7 +223,6 @@ exports.unlink_facebook = async (req, res) => {}
 
 exports.delete_account = async (req, res) => {
   const user = await User.findById(req.user.id)
-  const user = await User.findById(req.user.id)
   const userProfile = await findOne({ userId: req.user.id })
 
   if(user && userProfile) 
