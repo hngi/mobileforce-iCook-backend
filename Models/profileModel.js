@@ -18,7 +18,6 @@ const profileSchema = new schema({
   },
   gender: {
     type: String,
-    default: '',
     enum: ['male', 'female', 'others'],
   },
   userImage: {
