@@ -225,7 +225,22 @@ exports.delete_account = async (req, res) => {
   const user = await User.findById(req.user.id)
   const userProfile = await findOne({ userId: req.user.id })
 
-  const dishes = await Dish.findOne({ chefId: userProfile.id })
+  if(user && userProfile) 
+  {
+    let delete_user = await User.findOneAndRemove({profile:user.profile[0]})
+    let delete_userProfile = await Profile.findOneAndRemove({userid:req.user.id})
+    if (delete_user && delete_userProfile) {
+      res.status(200).json({
+        status:'success',
+        message:'user account deleted'
+      })
+    } else{
+      throw new Error('user not deletd')
+    }
+
+  }else {
+    throw new Error('account does not exist')
+  }
 }
 
 exports.upload_photo = async (req, res) => {
